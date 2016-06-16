@@ -43,6 +43,7 @@ public class ConsoleTest {
         assertTrue(commandRegistry.commandExists("sub"));
         assertTrue(commandRegistry.commandExists("two"));
         assertFalse(commandRegistry.commandExists("asdf"));
+        CommandHandler.parseForCommands("sub test (should not do anything)");
         CommandHandler.parseForCommands("main");
         CommandHandler.parseForCommands("main none");
         CommandHandler.parseForCommands("main none sub");

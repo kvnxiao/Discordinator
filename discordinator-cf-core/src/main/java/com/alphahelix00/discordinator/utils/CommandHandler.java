@@ -28,7 +28,9 @@ public class CommandHandler {
         // Iterate through message to see if they are commands
         LinkedList<Order> commands = new LinkedList<>();
         Order command = getMainCommand(args);
-        commands.add(command);
+        if (command != null) {
+            commands.add(command);
+        }
         if (command != null) {
             while (command != null && command.hasSubCommand()) {
                 Order subCommand = getSubCommand(command, args);
