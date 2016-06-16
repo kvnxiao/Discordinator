@@ -30,8 +30,6 @@ public class CommandHandler {
         Order command = getMainCommand(args);
         if (command != null) {
             commands.add(command);
-        }
-        if (command != null) {
             while (command != null && command.hasSubCommand()) {
                 Order subCommand = getSubCommand(command, args);
                 if (subCommand != null) {

@@ -1,6 +1,7 @@
 import com.alphahelix00.discordinator.Ordinator;
 import com.alphahelix00.discordinator.commands.Command;
 import com.alphahelix00.discordinator.commands.CommandRegistry;
+import com.alphahelix00.discordinator.commands.Order;
 import com.alphahelix00.discordinator.utils.CommandHandler;
 import org.junit.Test;
 
@@ -20,8 +21,8 @@ public class ConsoleTest {
         commandRegistry.addPrefix("?");
         assertTrue(commandRegistry.containsPrefix("!"));
         assertTrue(commandRegistry.containsPrefix("?"));
-        assertTrue(commandRegistry.getPrefixes().size() == 2);
         assertFalse(commandRegistry.containsPrefix("~"));
+        assertTrue(commandRegistry.getPrefixes().size() == 2);
     }
 
     @Test
@@ -30,8 +31,11 @@ public class ConsoleTest {
         CommandHandler.registerAnnotatedCommands(new SingleCommand());
         assertTrue(commandRegistry.commandExists("single"));
         assertTrue(commandRegistry.commandExists("one"));
+        // Test for different alias calls
         CommandHandler.parseForCommands("single");
         CommandHandler.parseForCommands("one");
+        // Test for extra arguments
+        CommandHandler.parseForCommands("single one abc def");
     }
 
     @Test
@@ -43,12 +47,15 @@ public class ConsoleTest {
         assertTrue(commandRegistry.commandExists("sub"));
         assertTrue(commandRegistry.commandExists("two"));
         assertFalse(commandRegistry.commandExists("asdf"));
+        // Test for calling subcommands without main command
         CommandHandler.parseForCommands("sub test (should not do anything)");
+        // Test for calling main commands and then sub commands
         CommandHandler.parseForCommands("main");
         CommandHandler.parseForCommands("main none");
         CommandHandler.parseForCommands("main none sub");
         CommandHandler.parseForCommands("main sub");
         CommandHandler.parseForCommands("main two");
+        // Test for tertiary subcommand call
         CommandHandler.parseForCommands("first sub sub");
     }
 
@@ -57,8 +64,9 @@ public class ConsoleTest {
         CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
         CommandHandler.registerAnnotatedCommands(new RepeatCommand());
         assertTrue(commandRegistry.commandExists("rep"));
+        // Test for calling main commands that reference sub commands to themselves
         CommandHandler.parseForCommands("rep once");
-        CommandHandler.parseForCommands("rep once rep rep");
+        CommandHandler.parseForCommands("rep rep rep once");
     }
 
 }
