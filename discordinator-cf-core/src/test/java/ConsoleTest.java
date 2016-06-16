@@ -1,6 +1,7 @@
 import com.alphahelix00.discordinator.Ordinator;
 import com.alphahelix00.discordinator.commands.Command;
 import com.alphahelix00.discordinator.commands.CommandRegistry;
+import com.alphahelix00.discordinator.utils.CommandHandler;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -24,17 +25,39 @@ public class ConsoleTest {
     }
 
     @Test
-    public void testSingleCommand() {
-        // parse message "!single"
-        // parse message "!one"
+    public void testSingleCommand() throws Exception {
+        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandHandler.registerAnnotatedCommands(new SingleCommand());
+        assertTrue(commandRegistry.commandExists("single"));
+        assertTrue(commandRegistry.commandExists("one"));
+        CommandHandler.parseForCommands("single");
+        CommandHandler.parseForCommands("one");
     }
 
-    @Command(
-            name = "single test",
-            alias = {"single", "one"},
-            desc = "test for a single command"
-    )
-    public void singleCommand() {
-        System.out.println("singleCommand() test!");
+    @Test
+    public void testMultiCommand() throws Exception {
+        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandHandler.registerAnnotatedCommands(new MultiCommand());
+        assertTrue(commandRegistry.commandExists("main"));
+        assertTrue(commandRegistry.commandExists("first"));
+        assertTrue(commandRegistry.commandExists("sub"));
+        assertTrue(commandRegistry.commandExists("two"));
+        assertFalse(commandRegistry.commandExists("asdf"));
+        CommandHandler.parseForCommands("main");
+        CommandHandler.parseForCommands("main none");
+        CommandHandler.parseForCommands("main none sub");
+        CommandHandler.parseForCommands("main sub");
+        CommandHandler.parseForCommands("main two");
+        CommandHandler.parseForCommands("first sub sub");
     }
+
+    @Test
+    public void testRepeatCommand() throws Exception {
+        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandHandler.registerAnnotatedCommands(new RepeatCommand());
+        assertTrue(commandRegistry.commandExists("rep"));
+        CommandHandler.parseForCommands("rep once");
+        CommandHandler.parseForCommands("rep once rep rep");
+    }
+
 }

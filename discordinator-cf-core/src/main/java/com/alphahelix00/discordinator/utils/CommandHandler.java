@@ -7,8 +7,7 @@ import com.alphahelix00.discordinator.commands.Order;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Created on: 6/15/2016
@@ -18,22 +17,64 @@ public class CommandHandler {
 
     private static final CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
 
-    public static void parseForCommands(String message) {
-        LinkedList<String> commandArgs = new LinkedList<>(Arrays.asList(message.split(" ")));
+    public static void parseForCommands(String message) throws Exception {
         // Take in a message string and parse it for main and sub commands
-        // Create a new linked list of purely main and sub commands, and a string for args
-        // execute command
+        LinkedList<String> commandArgs = new LinkedList<>(Arrays.asList(message.split(" ")));
+        LinkedList<Order> commands = createCommandList(commandArgs);
+        executeCommand(commands, commandArgs);
     }
 
-    public static void executeCommand(LinkedList<String> args) {
-        // given the alias from the linked list of strings,
-        // retrieve command from alias map
-
-        // then execute command with proper args
-        // commandRegistry.execute();
+    public static LinkedList<Order> createCommandList(LinkedList<String> args) {
+        // Iterate through message to see if they are commands
+        LinkedList<Order> commands = new LinkedList<>();
+        Order command = getMainCommand(args);
+        commands.add(command);
+        if (command != null) {
+            while (command != null && command.hasSubCommand()) {
+                Order subCommand = getSubCommand(command, args);
+                if (subCommand != null) {
+                    commands.add(subCommand);
+                }
+                command = subCommand;
+            }
+        }
+        return commands;
     }
 
-    public static void registerCommands(Object object) {
+    public static Order getMainCommand(LinkedList<String> args) {
+        // Check first message arg to see if it is a main command
+        String mainCommandAlias = args.removeFirst();
+        if (commandRegistry.commandExists(mainCommandAlias)) {
+            return commandRegistry.getMainCommandByAlias(mainCommandAlias);
+        }
+        return null;
+    }
+
+    public static Order getSubCommand(Order parentCommand, LinkedList<String> args) {
+        List<String> subCommandNames = parentCommand.getSubCommands();
+        List<Order> subCommands = new ArrayList<>();
+        for (String name : Collections.unmodifiableList(subCommandNames)) {
+            Order subCommand = commandRegistry.getCommandByName(name);
+            if (subCommand != null) {
+                subCommands.add(commandRegistry.getCommandByName(name));
+            }
+        }
+        for (Order command : subCommands) {
+            if (command.getAlias().contains(args.peek())) {
+                args.removeFirst();
+                return command;
+            }
+        }
+        return null;
+    }
+
+    public static void executeCommand(LinkedList<Order> commands, LinkedList<String> args) throws Exception {
+        for (Order command : commands) {
+            commandRegistry.execute(command, args);
+        }
+    }
+
+    public static void registerAnnotatedCommands(Object object) throws Exception {
         for (Method method : object.getClass().getMethods()) {
             // If method has annotated command class above it
             if (method.isAnnotationPresent(Command.class)) {
@@ -46,22 +87,29 @@ public class CommandHandler {
                 // Get parameters of method
                 Parameter[] parameters = method.getParameters();
                 Object[] arguments = new Object[parameters.length];
-                for (int i = 0; i < parameters.length; i++) {
-                    switch (parameters[i].getType().getSimpleName()) {
-                        // TODO: remove these special cases, for testing purposes only
-                        case "boolean":
-                            arguments[i] = true;
-                            break;
-                        case "int":
-                            arguments[i] = 0;
-                            break;
-                        default:
-                            arguments[i] = null;
-                            break;
+                if (parameters.length > 1) {
+                    for (int i = 1; i < parameters.length; i++) {
+                        switch (parameters[i].getType().getSimpleName()) {
+                            // TODO: remove these special cases, for testing purposes only
+                            case "boolean":
+                                arguments[i] = true;
+                                break;
+                            case "int":
+                                arguments[i] = 0;
+                                break;
+                            default:
+                                arguments[i] = null;
+                                break;
+                        }
                     }
                 }
                 // Add command to registry
                 commandRegistry.addCommand(new Order() {
+                    @Override
+                    public boolean isMainCommand() {
+                        return annotatedCommand.mainCommand();
+                    }
+
                     @Override
                     public String getName() {
                         return annotatedCommand.name();
@@ -73,17 +121,18 @@ public class CommandHandler {
                     }
 
                     @Override
-                    public String[] getAlias() {
-                        return annotatedCommand.alias();
+                    public List<String> getAlias() {
+                        return Arrays.asList(annotatedCommand.alias());
                     }
 
                     @Override
-                    public String[] getSubCommands() {
-                        return annotatedCommand.subCommands();
+                    public List<String> getSubCommands() {
+                        return Arrays.asList(annotatedCommand.subCommands());
                     }
 
                     @Override
                     public void execute(LinkedList<String> args) throws Exception {
+                        arguments[0] = args;
                         method.invoke(object, arguments);
                     }
                 });
