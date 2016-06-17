@@ -1,18 +1,20 @@
 # Discordinator.java
 A Java based command framework intended for Discord bots.
 
-**define:** _**Discordinator**_ = *Discord* + *Ordinator* (one who ordains or decrees)
+## About
 
-Discordinator is a modularized command framework originally intended for use in conjunction with other Discord APIs (such as Discord4J).
-However, it can also be easily adapted for use in any other project.
+**define:** _**Discordinator**_ = *[Discord](https://discordapp.com/)* + *Ordinator* (one who ordains or decrees)
 
-#Functionality
+Discordinator is a modularized command framework, created with the purpose to handle the processing and execution of user defined commands.
+Although originally intended for use in conjunction with other Discord API wrappers (e.g. [Discord4J](https://github.com/austinv11/Discord4J)), the core of the framework can also be easily adapted for use in any other project.
+
+##Functionality
 - Annotated command definitions with multiple command prefix support
 - Support for a "main" command and (optional) "sub-commands" that are called after the main command
 - **To-do list:**
   - Add support for registering commands in forms other than annotations (e.g. builder, read from files)
 
-#Contribution
+##Contribution
 Discordinator is still a **[Work In Progress]**
 
 For those of you who are interested seeing this project improve, all contributions are appreciated!
