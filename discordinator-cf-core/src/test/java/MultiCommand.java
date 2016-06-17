@@ -1,4 +1,4 @@
-import com.alphahelix00.discordinator.commands.Command;
+import com.alphahelix00.discordinator.commands.CommandAnnotation;
 
 import java.util.LinkedList;
 
@@ -8,7 +8,7 @@ import java.util.LinkedList;
  */
 public class MultiCommand {
 
-    @Command(
+    @CommandAnnotation(
             mainCommand = true,
             name = "main command",
             alias = {"main", "first"},
@@ -19,7 +19,7 @@ public class MultiCommand {
         System.out.println(this.getClass().getName() + args.toString() + " MAIN COMMAND");
     }
 
-    @Command(
+    @CommandAnnotation(
             name = "sub command 1",
             alias = {"sub", "two"},
             desc = "first sub",
@@ -29,7 +29,7 @@ public class MultiCommand {
         System.out.println(this.getClass().getName() + args.toString() + " SECONDARY COMMAND");
     }
 
-    @Command(
+    @CommandAnnotation(
             name = "sub command 2",
             alias = {"sub", "three"},
             desc = "second sub"

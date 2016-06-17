@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
  * Created on: 6/15/2016
  * Author:     Kevin Xiao
  */
-public class Ordinator {
+public class Discordinator {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(Ordinator.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(Discordinator.class);
 
     private static final CommandRegistry commandRegistry = new CommandRegistry();
     private static final PermissionRegistry permissionRegistry = new PermissionRegistry();

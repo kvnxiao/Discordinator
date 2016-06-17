@@ -1,9 +1,9 @@
 package com.alphahelix00.discordinator.utils;
 
-import com.alphahelix00.discordinator.Ordinator;
-import com.alphahelix00.discordinator.commands.Command;
+import com.alphahelix00.discordinator.Discordinator;
+import com.alphahelix00.discordinator.commands.CommandAnnotation;
 import com.alphahelix00.discordinator.commands.CommandRegistry;
-import com.alphahelix00.discordinator.commands.Order;
+import com.alphahelix00.discordinator.commands.Command;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -15,33 +15,34 @@ import java.util.*;
  */
 public class CommandHandler {
 
-    private static final CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+    private static final CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
 
     public static void parseForCommands(String message) throws Exception {
         // Take in a message string and parse it for main and sub commands
         LinkedList<String> commandArgs = new LinkedList<>(Arrays.asList(message.split(" ")));
-        LinkedList<Order> commands = createCommandList(commandArgs);
-        executeCommand(commands, commandArgs);
+        executeCommands(commandArgs);
     }
 
-    public static LinkedList<Order> createCommandList(LinkedList<String> args) {
+    public static void executeCommands(LinkedList<String> args) throws Exception {
         // Iterate through message to see if they are commands
-        LinkedList<Order> commands = new LinkedList<>();
-        Order command = getMainCommand(args);
+        Command command = getMainCommand(args);
         if (command != null) {
-            commands.add(command);
+            executeCommand(command, args);
             while (command != null && command.hasSubCommand()) {
-                Order subCommand = getSubCommand(command, args);
+                Command subCommand = getSubCommand(command, args);
                 if (subCommand != null) {
-                    commands.add(subCommand);
+                    executeCommand(subCommand, args);
                 }
                 command = subCommand;
             }
         }
-        return commands;
     }
 
-    public static Order getMainCommand(LinkedList<String> args) {
+    public static void executeCommand(Command command, LinkedList<String> args) throws Exception {
+        commandRegistry.execute(command, args);
+    }
+
+    public static Command getMainCommand(LinkedList<String> args) {
         // Check first message arg to see if it is a main command
         String mainCommandAlias = args.removeFirst();
         if (commandRegistry.commandExists(mainCommandAlias)) {
@@ -50,16 +51,16 @@ public class CommandHandler {
         return null;
     }
 
-    public static Order getSubCommand(Order parentCommand, LinkedList<String> args) {
+    public static Command getSubCommand(Command parentCommand, LinkedList<String> args) {
         List<String> subCommandNames = parentCommand.getSubCommands();
-        List<Order> subCommands = new ArrayList<>();
+        List<Command> subCommands = new ArrayList<>();
         for (String name : Collections.unmodifiableList(subCommandNames)) {
-            Order subCommand = commandRegistry.getCommandByName(name);
+            Command subCommand = commandRegistry.getCommandByName(name);
             if (subCommand != null) {
                 subCommands.add(commandRegistry.getCommandByName(name));
             }
         }
-        for (Order command : subCommands) {
+        for (Command command : subCommands) {
             if (command.getAlias().contains(args.peek())) {
                 args.removeFirst();
                 return command;
@@ -68,18 +69,12 @@ public class CommandHandler {
         return null;
     }
 
-    public static void executeCommand(LinkedList<Order> commands, LinkedList<String> args) throws Exception {
-        for (Order command : commands) {
-            commandRegistry.execute(command, args);
-        }
-    }
-
     public static void registerAnnotatedCommands(Object object) throws Exception {
         for (Method method : object.getClass().getMethods()) {
             // If method has annotated command class above it
-            if (method.isAnnotationPresent(Command.class)) {
+            if (method.isAnnotationPresent(CommandAnnotation.class)) {
                 // Get annotated command from object's method
-                Command annotatedCommand = method.getAnnotation(Command.class);
+                CommandAnnotation annotatedCommand = method.getAnnotation(CommandAnnotation.class);
                 // Generate a command based on the annotations, and add to registry
                 String prefix = annotatedCommand.prefix();
                 commandRegistry.addPrefix(prefix);
@@ -104,7 +99,7 @@ public class CommandHandler {
                     }
                 }
                 // Add command to registry
-                commandRegistry.addCommand(new Order() {
+                commandRegistry.addCommand(new Command() {
                     @Override
                     public boolean isMainCommand() {
                         return annotatedCommand.mainCommand();

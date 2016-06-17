@@ -1,36 +1,28 @@
 package com.alphahelix00.discordinator.commands;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
 /**
  * Created on: 6/15/2016
  * Author:     Kevin Xiao
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Command {
+public abstract class Command implements CommandExecutor {
 
-    String prefix() default CommandDefaults.PREFIX;
+    public abstract String getName();
+    public abstract String getDesc();
+    public abstract List<String> getAlias();
+    public abstract List<String> getSubCommands();
+    public abstract boolean isMainCommand();
 
-    String[] subCommands() default {};
+    public boolean hasSubCommand() {
+        if (getSubCommands() != null) {
+            return getSubCommands().size() > 0;
+        }
+        return false;
+    }
 
-    boolean requireMention() default CommandDefaults.REQUIRE_MENTION;
-
-    String perm() default CommandDefaults.PERMISSION;
-
-    boolean allowPrivateMessage() default CommandDefaults.ALLOW_PRIVATE_MESSAGES;
-
-    boolean allowChannelMessage() default CommandDefaults.ALLOW_CHANNEL_MESSAGES;
-
-    boolean mainCommand() default CommandDefaults.MAIN_COMMAND;
-
-    String name();
-
-    String[] alias();
-
-    String desc();
-
+    @Override
+    public String toString() {
+        return getName() + " - " + getDesc();
+    }
 }

@@ -7,7 +7,7 @@ import java.util.LinkedList;
  * Author:     Kevin Xiao
  */
 @FunctionalInterface
-public interface Executor {
+public interface CommandExecutor {
 
     void execute(LinkedList<String> args) throws Exception;
 }

@@ -1,4 +1,4 @@
-import com.alphahelix00.discordinator.commands.Command;
+import com.alphahelix00.discordinator.commands.CommandAnnotation;
 
 import java.util.LinkedList;
 
@@ -8,7 +8,7 @@ import java.util.LinkedList;
  */
 public class SingleCommand {
 
-    @Command(
+    @CommandAnnotation(
             mainCommand = true,
             name = "single test",
             alias = {"single", "one"},

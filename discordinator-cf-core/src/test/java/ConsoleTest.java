@@ -1,7 +1,5 @@
-import com.alphahelix00.discordinator.Ordinator;
-import com.alphahelix00.discordinator.commands.Command;
+import com.alphahelix00.discordinator.Discordinator;
 import com.alphahelix00.discordinator.commands.CommandRegistry;
-import com.alphahelix00.discordinator.commands.Order;
 import com.alphahelix00.discordinator.utils.CommandHandler;
 import org.junit.Test;
 
@@ -16,7 +14,7 @@ public class ConsoleTest {
 
     @Test
     public void testCommandRegistry() {
-        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         commandRegistry.addPrefix("!");
         commandRegistry.addPrefix("?");
         assertTrue(commandRegistry.containsPrefix("!"));
@@ -27,7 +25,7 @@ public class ConsoleTest {
 
     @Test
     public void testSingleCommand() throws Exception {
-        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         CommandHandler.registerAnnotatedCommands(new SingleCommand());
         assertTrue(commandRegistry.commandExists("single"));
         assertTrue(commandRegistry.commandExists("one"));
@@ -40,7 +38,7 @@ public class ConsoleTest {
 
     @Test
     public void testMultiCommand() throws Exception {
-        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         CommandHandler.registerAnnotatedCommands(new MultiCommand());
         assertTrue(commandRegistry.commandExists("main"));
         assertTrue(commandRegistry.commandExists("first"));
@@ -61,7 +59,7 @@ public class ConsoleTest {
 
     @Test
     public void testRepeatCommand() throws Exception {
-        CommandRegistry commandRegistry = Ordinator.getCommandRegistry();
+        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         CommandHandler.registerAnnotatedCommands(new RepeatCommand());
         assertTrue(commandRegistry.commandExists("rep"));
         // Test for calling main commands that reference sub commands to themselves

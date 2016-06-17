@@ -1,5 +1,9 @@
 package com.alphahelix00.discordinator.commands;
 
+import com.alphahelix00.discordinator.Discordinator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -8,8 +12,10 @@ import java.util.*;
  */
 public class CommandRegistry {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(CommandRegistry.class);
+
     private final Set<String> prefixes;
-    private final Map<String, Order> commandMap;
+    private final Map<String, Command> commandMap;
 
     public CommandRegistry() {
         prefixes = new HashSet<>();
@@ -17,7 +23,7 @@ public class CommandRegistry {
         this.addPrefix(CommandDefaults.PREFIX);
     }
 
-    public void addCommand(Order command) throws Exception {
+    public void addCommand(Command command) throws Exception {
         commandMap.put(command.getName(), command);
     }
 
@@ -29,7 +35,7 @@ public class CommandRegistry {
      * Returns an unmodifiable list of all available commands in the command registry
      * @return unmodifiable list of all commands
      */
-    public Map<String, Order> getCommandList() {
+    public Map<String, Command> getCommandList() {
         return Collections.unmodifiableMap(commandMap);
     }
 
@@ -42,8 +48,8 @@ public class CommandRegistry {
     }
 
     public boolean commandExists(String alias) {
-        List<Order> commands = Collections.unmodifiableList(new ArrayList<>(commandMap.values()));
-        for (Order command : commands) {
+        List<Command> commands = Collections.unmodifiableList(new ArrayList<>(commandMap.values()));
+        for (Command command : commands) {
             if (command.getAlias().contains(alias)) {
                 return true;
             }
@@ -65,13 +71,13 @@ public class CommandRegistry {
         return false;
     }
 
-    public void execute(Order command, LinkedList<String> args) throws Exception {
+    public void execute(Command command, LinkedList<String> args) throws Exception {
         command.execute(args);
     }
 
-    public Order getMainCommandByAlias(String alias) {
-        List<Order> commandList = Collections.unmodifiableList(new ArrayList<>(commandMap.values()));
-        for (Order command : commandList) {
+    public Command getMainCommandByAlias(String alias) {
+        List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(commandMap.values()));
+        for (Command command : commandList) {
             if (command.isMainCommand() && command.getAlias().contains(alias)) {
                 return command;
             }
@@ -79,7 +85,7 @@ public class CommandRegistry {
         return null;
     }
 
-    public Order getCommandByName(String name) {
+    public Command getCommandByName(String name) {
         if (commandMap.containsKey(name)) {
             return commandMap.get(name);
         }
