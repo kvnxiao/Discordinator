@@ -26,45 +26,48 @@ public class ConsoleTest {
     @Test
     public void testSingleCommand() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler.registerAnnotatedCommands(new SingleCommand());
-        assertTrue(commandRegistry.commandExists("single"));
-        assertTrue(commandRegistry.commandExists("one"));
+        CommandHandler commandHandler = new CommandHandler();
+        commandHandler.registerAnnotatedCommands(new SingleCommand());
+        assertTrue(commandRegistry.commandExists("single", "!"));
+        assertTrue(commandRegistry.commandExists("one", "!"));
         // Test for different alias calls
-        CommandHandler.parseForCommands("single");
-        CommandHandler.parseForCommands("one");
+        commandHandler.parseForCommands("!single");
+        commandHandler.parseForCommands("!one");
         // Test for extra arguments
-        CommandHandler.parseForCommands("single one abc def");
+        commandHandler.parseForCommands("!single one abc    def");
     }
 
     @Test
     public void testMultiCommand() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler.registerAnnotatedCommands(new MultiCommand());
-        assertTrue(commandRegistry.commandExists("main"));
-        assertTrue(commandRegistry.commandExists("first"));
-        assertTrue(commandRegistry.commandExists("sub"));
-        assertTrue(commandRegistry.commandExists("two"));
-        assertFalse(commandRegistry.commandExists("asdf"));
+        CommandHandler commandHandler = new CommandHandler();
+        commandHandler.registerAnnotatedCommands(new MultiCommand());
+        assertTrue(commandRegistry.commandExists("main", "?"));
+        assertFalse(commandRegistry.commandExists("first", "!"));
+        assertTrue(commandRegistry.commandExists("sub", "?"));
+        assertTrue(commandRegistry.commandExists("two", "?"));
+        assertFalse(commandRegistry.commandExists("asdf", "!"));
         // Test for calling subcommands without main command
-        CommandHandler.parseForCommands("sub test (should not do anything)");
+        commandHandler.parseForCommands("?sub test (should not do anything)");
         // Test for calling main commands and then sub commands
-        CommandHandler.parseForCommands("main");
-        CommandHandler.parseForCommands("main none");
-        CommandHandler.parseForCommands("main none sub");
-        CommandHandler.parseForCommands("main sub");
-        CommandHandler.parseForCommands("main two");
+        commandHandler.parseForCommands("?main");
+        commandHandler.parseForCommands("?main none");
+        commandHandler.parseForCommands("?main none sub");
+        commandHandler.parseForCommands("?main sub");
+        commandHandler.parseForCommands("!main two");
         // Test for tertiary subcommand call
-        CommandHandler.parseForCommands("first sub sub");
+        commandHandler.parseForCommands("?first sub sub");
     }
 
     @Test
     public void testRepeatCommand() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler.registerAnnotatedCommands(new RepeatCommand());
-        assertTrue(commandRegistry.commandExists("rep"));
+        CommandHandler commandHandler = new CommandHandler();
+        commandHandler.registerAnnotatedCommands(new RepeatCommand());
+        assertTrue(commandRegistry.commandExists("rep", "~"));
         // Test for calling main commands that reference sub commands to themselves
-        CommandHandler.parseForCommands("rep once");
-        CommandHandler.parseForCommands("rep rep rep once");
+        commandHandler.parseForCommands("~rep once");
+        commandHandler.parseForCommands("~rep rep rep once");
     }
 
 }

@@ -10,6 +10,7 @@ public class RepeatCommand {
 
     @CommandAnnotation(
             mainCommand = true,
+            prefix = "~",
             name = "repeat command",
             alias = {"rep"},
             desc = "test for repeating command",

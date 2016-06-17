@@ -13,6 +13,7 @@ public abstract class Command implements CommandExecutor {
     public abstract List<String> getAlias();
     public abstract List<String> getSubCommands();
     public abstract boolean isMainCommand();
+    public abstract String getPrefix();
 
     public boolean hasSubCommand() {
         if (getSubCommands() != null) {

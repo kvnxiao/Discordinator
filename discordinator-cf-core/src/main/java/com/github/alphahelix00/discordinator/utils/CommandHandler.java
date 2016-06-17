@@ -1,12 +1,11 @@
 package com.github.alphahelix00.discordinator.utils;
 
 import com.github.alphahelix00.discordinator.Discordinator;
+import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
-import com.github.alphahelix00.discordinator.commands.Command;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
@@ -15,49 +14,70 @@ import java.util.*;
  */
 public class CommandHandler {
 
-    private static final CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
+    protected static final CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
 
-    public static void parseForCommands(String message) throws Exception {
+    public void parseForCommands(String message) {
         // Take in a message string and parse it for main and sub commands
-        LinkedList<String> commandArgs = new LinkedList<>(Arrays.asList(message.split(" ")));
-        executeCommands(commandArgs);
+        LinkedList<String> commandArgs = new LinkedList<>(Arrays.asList(message.split("\\s+")));
+        try {
+            executeCommands(commandArgs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void executeCommands(LinkedList<String> args) throws Exception {
+    public void executeCommands(LinkedList<String> args, Object... extraArgs) throws Exception {
         // Iterate through message to see if they are commands
         Command command = getMainCommand(args);
         if (command != null) {
-            executeCommand(command, args);
+            executeCommand(command, args, extraArgs);
             while (command != null && command.hasSubCommand()) {
                 Command subCommand = getSubCommand(command, args);
                 if (subCommand != null) {
-                    executeCommand(subCommand, args);
+                    executeCommand(command, args, extraArgs);
                 }
                 command = subCommand;
             }
         }
     }
 
-    public static void executeCommand(Command command, LinkedList<String> args) throws Exception {
-        commandRegistry.execute(command, args);
+    /**
+     * Executes the command with given arguments
+     * @param command   the command to execute
+     * @param args      arguments for command
+     * @throws Exception
+     */
+    public void executeCommand(Command command, LinkedList<String> args) throws Exception {
+        command.execute(args);
     }
 
-    public static Command getMainCommand(LinkedList<String> args) {
+    public void executeCommand(Command command, LinkedList<String> args, Object... extraArgs) throws Exception {
+        this.executeCommand(command, args);
+    }
+
+    public Command getMainCommand(LinkedList<String> args) {
         // Check first message arg to see if it is a main command
-        String mainCommandAlias = args.removeFirst();
-        if (commandRegistry.commandExists(mainCommandAlias)) {
-            return commandRegistry.getMainCommandByAlias(mainCommandAlias);
+        String firstArg = args.removeFirst();
+        String prefix;
+        for (String identifier : commandRegistry.getPrefixes()) {
+            if (firstArg.startsWith(identifier)) {
+                prefix = identifier;
+                String mainCommandAlias = firstArg.substring(prefix.length());
+                if (commandRegistry.commandExists(mainCommandAlias, prefix)) {
+                    return commandRegistry.getMainCommandByAlias(mainCommandAlias, prefix);
+                }
+            }
         }
         return null;
     }
 
-    public static Command getSubCommand(Command parentCommand, LinkedList<String> args) {
+    public Command getSubCommand(Command parentCommand, LinkedList<String> args) {
         List<String> subCommandNames = parentCommand.getSubCommands();
         List<Command> subCommands = new ArrayList<>();
         for (String name : Collections.unmodifiableList(subCommandNames)) {
-            Command subCommand = commandRegistry.getCommandByName(name);
+            Command subCommand = commandRegistry.getCommandByName(name, parentCommand.getPrefix());
             if (subCommand != null) {
-                subCommands.add(commandRegistry.getCommandByName(name));
+                subCommands.add(commandRegistry.getCommandByName(name, parentCommand.getPrefix()));
             }
         }
         for (Command command : subCommands) {
@@ -69,32 +89,19 @@ public class CommandHandler {
         return null;
     }
 
-    public static void registerAnnotatedCommands(Object object) throws Exception {
+    public void registerAnnotatedCommands(Object object) throws Exception {
         for (Method method : object.getClass().getMethods()) {
             // If method has annotated command class above it
             if (method.isAnnotationPresent(CommandAnnotation.class)) {
                 // Get annotated command from object's method
                 CommandAnnotation annotatedCommand = method.getAnnotation(CommandAnnotation.class);
                 // Generate a command based on the annotations, and add to registry
-                String prefix = annotatedCommand.prefix();
-                commandRegistry.addPrefix(prefix);
-
-                // Get parameters of method
-                Parameter[] parameters = method.getParameters();
-                Object[] arguments = new Object[parameters.length];
-
-                // For use in D4J or other projects that require different method parameters as arguments
-//                if (parameters.length > 1) {
-//                    for (int i = 1; i < parameters.length; i++) {
-//                        switch (parameters[i].getType().getSimpleName()) {
-//                            default:
-//                                arguments[i] = null;
-//                                break;
-//                        }
-//                    }
-//                }
-                // Add command to registry
                 commandRegistry.addCommand(new Command() {
+                    @Override
+                    public String getPrefix() {
+                        return annotatedCommand.prefix();
+                    }
+
                     @Override
                     public boolean isMainCommand() {
                         return annotatedCommand.mainCommand();
@@ -122,8 +129,7 @@ public class CommandHandler {
 
                     @Override
                     public void execute(LinkedList<String> args) throws Exception {
-                        arguments[0] = args;
-                        method.invoke(object, arguments);
+                        method.invoke(object, args);
                     }
                 });
             }

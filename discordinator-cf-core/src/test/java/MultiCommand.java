@@ -10,6 +10,7 @@ public class MultiCommand {
 
     @CommandAnnotation(
             mainCommand = true,
+            prefix = "?",
             name = "main command",
             alias = {"main", "first"},
             desc = "test for a single command",
@@ -21,6 +22,7 @@ public class MultiCommand {
 
     @CommandAnnotation(
             name = "sub command 1",
+            prefix = "?",
             alias = {"sub", "two"},
             desc = "first sub",
             subCommands = {"sub command 2"}
@@ -31,6 +33,7 @@ public class MultiCommand {
 
     @CommandAnnotation(
             name = "sub command 2",
+            prefix = "?",
             alias = {"sub", "three"},
             desc = "second sub"
     )
