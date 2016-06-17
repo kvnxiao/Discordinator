@@ -10,7 +10,7 @@
     <version>0.5</version>
     <modules>
         <module>discordinator-cf-core</module>
-        <module>discordinator-cf-discord4j</module>
+        <module>discordinator-cf-d4j</module>
     </modules>
 
     <properties>

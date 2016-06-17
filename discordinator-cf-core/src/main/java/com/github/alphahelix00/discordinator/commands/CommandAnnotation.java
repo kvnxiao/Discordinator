@@ -1,4 +1,4 @@
-package com.alphahelix00.discordinator.commands;
+package com.github.alphahelix00.discordinator.commands;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

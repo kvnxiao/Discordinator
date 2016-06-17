@@ -1,4 +1,4 @@
-import com.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
 
 import java.util.LinkedList;
 

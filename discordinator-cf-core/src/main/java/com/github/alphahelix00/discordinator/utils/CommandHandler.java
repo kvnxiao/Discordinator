@@ -1,9 +1,9 @@
-package com.alphahelix00.discordinator.utils;
+package com.github.alphahelix00.discordinator.utils;
 
-import com.alphahelix00.discordinator.Discordinator;
-import com.alphahelix00.discordinator.commands.CommandAnnotation;
-import com.alphahelix00.discordinator.commands.CommandRegistry;
-import com.alphahelix00.discordinator.commands.Command;
+import com.github.alphahelix00.discordinator.Discordinator;
+import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.CommandRegistry;
+import com.github.alphahelix00.discordinator.commands.Command;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -82,22 +82,17 @@ public class CommandHandler {
                 // Get parameters of method
                 Parameter[] parameters = method.getParameters();
                 Object[] arguments = new Object[parameters.length];
-                if (parameters.length > 1) {
-                    for (int i = 1; i < parameters.length; i++) {
-                        switch (parameters[i].getType().getSimpleName()) {
-                            // TODO: remove these special cases, for testing purposes only
-                            case "boolean":
-                                arguments[i] = true;
-                                break;
-                            case "int":
-                                arguments[i] = 0;
-                                break;
-                            default:
-                                arguments[i] = null;
-                                break;
-                        }
-                    }
-                }
+
+                // For use in D4J or other projects that require different method parameters as arguments
+//                if (parameters.length > 1) {
+//                    for (int i = 1; i < parameters.length; i++) {
+//                        switch (parameters[i].getType().getSimpleName()) {
+//                            default:
+//                                arguments[i] = null;
+//                                break;
+//                        }
+//                    }
+//                }
                 // Add command to registry
                 commandRegistry.addCommand(new Command() {
                     @Override

@@ -1,4 +1,4 @@
-package com.alphahelix00.discordinator.commands;
+package com.github.alphahelix00.discordinator.commands;
 
 /**
  * Created on: 6/15/2016

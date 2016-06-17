@@ -1,4 +1,4 @@
-package com.alphahelix00.discordinator.permissions;
+package com.github.alphahelix00.discordinator.permissions;
 
 /**
  * Created on: 6/15/2016

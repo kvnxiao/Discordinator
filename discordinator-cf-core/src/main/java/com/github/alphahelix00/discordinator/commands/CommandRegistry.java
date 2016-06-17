@@ -1,6 +1,5 @@
-package com.alphahelix00.discordinator.commands;
+package com.github.alphahelix00.discordinator.commands;
 
-import com.alphahelix00.discordinator.Discordinator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
-package com.alphahelix00.discordinator;
+package com.github.alphahelix00.discordinator;
 
-import com.alphahelix00.discordinator.commands.CommandRegistry;
-import com.alphahelix00.discordinator.permissions.PermissionRegistry;
+import com.github.alphahelix00.discordinator.commands.CommandRegistry;
+import com.github.alphahelix00.discordinator.permissions.PermissionRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

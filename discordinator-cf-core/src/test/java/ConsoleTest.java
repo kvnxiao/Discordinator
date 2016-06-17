@@ -1,6 +1,6 @@
-import com.alphahelix00.discordinator.Discordinator;
-import com.alphahelix00.discordinator.commands.CommandRegistry;
-import com.alphahelix00.discordinator.utils.CommandHandler;
+import com.github.alphahelix00.discordinator.Discordinator;
+import com.github.alphahelix00.discordinator.commands.CommandRegistry;
+import com.github.alphahelix00.discordinator.utils.CommandHandler;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
