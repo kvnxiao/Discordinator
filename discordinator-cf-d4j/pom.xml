@@ -9,14 +9,16 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>discordinator-cf-discord4j</artifactId>
+    <artifactId>discordinator-cf-d4j</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.github.austinv11</groupId>
-            <artifactId>Discord4J</artifactId>
+            <artifactId>Discord4j</artifactId>
             <version>dev-SNAPSHOT</version>
+            <classifier>shaded</classifier>
         </dependency>
     </dependencies>
+
 
 </project>
