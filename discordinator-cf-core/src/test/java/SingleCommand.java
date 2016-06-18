@@ -9,11 +9,11 @@ import java.util.LinkedList;
 public class SingleCommand {
 
     @MainCommand(
-            name = "single test",
+            name = "SingleCommand MAIN",
             alias = {"single", "one"},
-            desc = "single test"
+            desc = "single command test"
     )
     public void singleCommand(LinkedList<String> args) {
-        System.out.println(this.getClass().getName() + args.toString());
+        System.out.println(this.getClass().getName() + args.toString() + " SingleCommand test!");
     }
 }

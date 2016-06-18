@@ -10,7 +10,7 @@ public class RepeatCommand {
 
     @MainCommand(
             prefix = "~",
-            name = "repeat command",
+            name = "RepeatCommand MAIN",
             alias = {"rep"},
             desc = "test for repeating command",
             subCommands = {"repeat command"}
