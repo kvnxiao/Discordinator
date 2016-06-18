@@ -1,4 +1,4 @@
-import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.MainCommand;
 
 import java.util.LinkedList;
 
@@ -8,8 +8,7 @@ import java.util.LinkedList;
  */
 public class RepeatCommand {
 
-    @CommandAnnotation(
-            mainCommand = true,
+    @MainCommand(
             prefix = "~",
             name = "repeat command",
             alias = {"rep"},

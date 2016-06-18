@@ -1,7 +1,7 @@
 package com.github.alphahelix00.discordinator.d4j.handler;
 
 import com.github.alphahelix00.discordinator.commands.Command;
-import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.MainCommand;
 import com.github.alphahelix00.discordinator.d4j.commands.CommandD4J;
 import com.github.alphahelix00.discordinator.utils.CommandHandler;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
@@ -51,9 +51,9 @@ public class CommandHandlerD4J extends CommandHandler {
     public void registerAnnotatedCommands(Object object) throws Exception {
         for (Method method : object.getClass().getMethods()) {
             // If method has annotated command class above it
-            if (method.isAnnotationPresent(CommandAnnotation.class)) {
+            if (method.isAnnotationPresent(MainCommand.class)) {
                 // Get annotated command from object's method
-                CommandAnnotation annotatedCommand = method.getAnnotation(CommandAnnotation.class);
+                MainCommand annotatedCommand = method.getAnnotation(MainCommand.class);
                 // Generate a command based on the annotations, and add to registry
                 commandRegistry.addCommand(new CommandD4J() {
                     @Override
@@ -63,7 +63,7 @@ public class CommandHandlerD4J extends CommandHandler {
 
                     @Override
                     public boolean isMainCommand() {
-                        return annotatedCommand.mainCommand();
+                        return true;
                     }
 
                     @Override
@@ -82,7 +82,7 @@ public class CommandHandlerD4J extends CommandHandler {
                     }
 
                     @Override
-                    public List<String> getSubCommands() {
+                    public List<String> getSubCommandNames() {
                         return Arrays.asList(annotatedCommand.subCommands());
                     }
 

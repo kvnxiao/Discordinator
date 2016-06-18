@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface CommandAnnotation {
+public @interface MainCommand {
 
     String prefix() default CommandDefaults.PREFIX;
 
@@ -24,8 +24,6 @@ public @interface CommandAnnotation {
     boolean allowPrivateMessage() default CommandDefaults.ALLOW_PRIVATE_MESSAGES;
 
     boolean allowChannelMessage() default CommandDefaults.ALLOW_CHANNEL_MESSAGES;
-
-    boolean mainCommand() default CommandDefaults.MAIN_COMMAND;
 
     String name();
 

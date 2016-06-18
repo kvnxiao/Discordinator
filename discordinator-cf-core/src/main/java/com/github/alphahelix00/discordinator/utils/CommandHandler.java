@@ -2,8 +2,11 @@ package com.github.alphahelix00.discordinator.utils;
 
 import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.commands.Command;
-import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.MainCommand;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
+import com.github.alphahelix00.discordinator.commands.SubCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -14,6 +17,7 @@ import java.util.*;
  */
 public class CommandHandler {
 
+    protected static final Logger LOGGER = LoggerFactory.getLogger(CommandHandler.class);
     protected static final CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
 
     public void parseForCommands(String message) {
@@ -72,7 +76,7 @@ public class CommandHandler {
     }
 
     public Command getSubCommand(Command parentCommand, LinkedList<String> args) {
-        List<String> subCommandNames = parentCommand.getSubCommands();
+        List<String> subCommandNames = parentCommand.getSubCommandNames();
         List<Command> subCommands = new ArrayList<>();
         for (String name : Collections.unmodifiableList(subCommandNames)) {
             Command subCommand = commandRegistry.getCommandByName(name, parentCommand.getPrefix());
@@ -90,48 +94,123 @@ public class CommandHandler {
     }
 
     public void registerAnnotatedCommands(Object object) throws Exception {
+        List<Method> mainMethods = new ArrayList<>();
+        List<Method> subMethods = new ArrayList<>();
         for (Method method : object.getClass().getMethods()) {
-            // If method has annotated command class above it
-            if (method.isAnnotationPresent(CommandAnnotation.class)) {
-                // Get annotated command from object's method
-                CommandAnnotation annotatedCommand = method.getAnnotation(CommandAnnotation.class);
-                // Generate a command based on the annotations, and add to registry
-                commandRegistry.addCommand(new Command() {
-                    @Override
-                    public String getPrefix() {
-                        return annotatedCommand.prefix();
-                    }
+            // Parse class for methods with command annotations
+            if (method.isAnnotationPresent(MainCommand.class)) {
+                mainMethods.add(method);
+            } else if (method.isAnnotationPresent(SubCommand.class)) {
+                subMethods.add(method);
+            }
+        }
+        if (mainMethods.size() > 0) {
+            createMainCommand(object, mainMethods, subMethods);
+        } else {
+            LOGGER.warn("No main methods detected in " + object.getClass().getSimpleName());
+        }
+    }
 
-                    @Override
-                    public boolean isMainCommand() {
-                        return annotatedCommand.mainCommand();
-                    }
+    public void createMainCommand(Object object, List<Method> mainMethods, List<Method> subMethods) throws Exception {
+        for (Method method : mainMethods) {
+            MainCommand annotatedCommand = method.getAnnotation(MainCommand.class);
+            // Generate a command based on the annotations, and add to registry
+            Command mainCommand = new Command() {
+                @Override
+                public String getPrefix() {
+                    return annotatedCommand.prefix();
+                }
 
-                    @Override
-                    public String getName() {
-                        return annotatedCommand.name();
-                    }
+                @Override
+                public boolean isMainCommand() {
+                    return true;
+                }
 
-                    @Override
-                    public String getDesc() {
-                        return annotatedCommand.desc();
-                    }
+                @Override
+                public String getName() {
+                    return annotatedCommand.name();
+                }
 
-                    @Override
-                    public List<String> getAlias() {
-                        return Arrays.asList(annotatedCommand.alias());
-                    }
+                @Override
+                public String getDesc() {
+                    return annotatedCommand.desc();
+                }
 
-                    @Override
-                    public List<String> getSubCommands() {
-                        return Arrays.asList(annotatedCommand.subCommands());
-                    }
+                @Override
+                public List<String> getAlias() {
+                    return Arrays.asList(annotatedCommand.alias());
+                }
 
-                    @Override
-                    public void execute(LinkedList<String> args) throws Exception {
-                        method.invoke(object, args);
+                @Override
+                public List<String> getSubCommandNames() {
+                    return Arrays.asList(annotatedCommand.subCommands());
+                }
+
+                @Override
+                public void execute(LinkedList<String> args) throws Exception {
+                    method.invoke(object, args);
+                }
+            };
+            // Check if main command is a repeating command
+            if (mainCommand.getSubCommandNames().contains(mainCommand.getName())) {
+                mainCommand.addSubCommand(mainCommand);
+            }
+            // Check if main command has sub commands
+            if (mainCommand.hasSubCommand()) {
+                createSubCommand(object, mainCommand, subMethods);
+            }
+            commandRegistry.addCommand(mainCommand);
+        }
+    }
+
+    public void createSubCommand(Object object, Command parentCommand, List<Method> subMethods) {
+        // Iterate through all sub command names declared in parent command's
+        for (String subCommandName : parentCommand.getSubCommandNames()) {
+            for (Method method : subMethods) {
+                SubCommand annotatedCommand = method.getAnnotation(SubCommand.class);
+                if (subCommandName.equals(annotatedCommand.name())) {
+                    Command subCommand = new Command() {
+                        @Override
+                        public String getPrefix() {
+                            return annotatedCommand.prefix();
+                        }
+
+                        @Override
+                        public boolean isMainCommand() {
+                            return false;
+                        }
+
+                        @Override
+                        public String getName() {
+                            return annotatedCommand.name();
+                        }
+
+                        @Override
+                        public String getDesc() {
+                            return annotatedCommand.desc();
+                        }
+
+                        @Override
+                        public List<String> getAlias() {
+                            return Arrays.asList(annotatedCommand.alias());
+                        }
+
+                        @Override
+                        public List<String> getSubCommandNames() {
+                            return Arrays.asList(annotatedCommand.subCommands());
+                        }
+
+                        @Override
+                        public void execute(LinkedList<String> args) throws Exception {
+                            method.invoke(object, args);
+                        }
+                    };
+                    if (subCommand.hasSubCommand()) {
+                        createSubCommand(object, subCommand, subMethods);
                     }
-                });
+                    // Add subCommand to main command
+                    parentCommand.addSubCommand(subCommand);
+                }
             }
         }
     }

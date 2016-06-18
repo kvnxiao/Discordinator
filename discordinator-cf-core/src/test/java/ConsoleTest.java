@@ -2,10 +2,12 @@ import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
 import com.github.alphahelix00.discordinator.utils.CommandHandler;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,42 +21,42 @@ import static org.junit.Assert.assertTrue;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ConsoleTest {
 
-    @Test
-    public void testaCommandRegistry() throws Exception {
-        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler commandHandler = new CommandHandler();
-        commandRegistry.addPrefix("!");
-        commandRegistry.addPrefix("?");
+    private CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
+    private CommandHandler commandHandler = new CommandHandler();
+
+    @Before
+    public void setUp() throws Exception {
         commandHandler.registerAnnotatedCommands(new SingleCommand());
         commandHandler.registerAnnotatedCommands(new MultiCommand());
         commandHandler.registerAnnotatedCommands(new RepeatCommand());
+    }
+
+    @Test
+    public void testaCommandRegistry() {
+        commandRegistry.addPrefix("-");
         assertTrue(commandRegistry.containsPrefix("!"));
         assertTrue(commandRegistry.containsPrefix("?"));
         assertTrue(commandRegistry.containsPrefix("~"));
-        assertTrue(commandRegistry.getPrefixes().size() == 3);
+        assertTrue(commandRegistry.getPrefixes().size() == 4);
     }
 
     @Test
     public void testaSingleCommand() throws Exception {
-        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler commandHandler = new CommandHandler();
         assertTrue(commandRegistry.commandExists("single", "!"));
         assertTrue(commandRegistry.commandExists("one", "!"));
         // Test for different alias calls
         commandHandler.parseForCommands("!single");
         commandHandler.parseForCommands("!one");
-        // Test for extra arguments
+        // Test for extra arguments and extra whitespace
         commandHandler.parseForCommands("!single one abc    def");
     }
 
     @Test
     public void testbMultiCommand() throws Exception {
-        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler commandHandler = new CommandHandler();
         assertTrue(commandRegistry.commandExists("main", "?"));
         assertFalse(commandRegistry.commandExists("first", "!"));
-        assertTrue(commandRegistry.commandExists("sub", "?"));
-        assertTrue(commandRegistry.commandExists("two", "?"));
+        assertFalse(commandRegistry.commandExists("sub", "?"));
+        assertFalse(commandRegistry.commandExists("two", "?"));
         assertFalse(commandRegistry.commandExists("asdf", "!"));
         // Test for calling subcommands without main command
         commandHandler.parseForCommands("?sub test (should not do anything)");
@@ -70,8 +72,6 @@ public class ConsoleTest {
 
     @Test
     public void testcRepeatCommand() throws Exception {
-        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        CommandHandler commandHandler = new CommandHandler();
         assertTrue(commandRegistry.commandExists("rep", "~"));
         // Test for calling main commands that reference sub commands to themselves
         commandHandler.parseForCommands("~rep once");
@@ -79,15 +79,27 @@ public class ConsoleTest {
     }
 
     @Test
-    public void testzCommandList() {
-        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-        List<Map<String, Command>> commandList = commandRegistry.getCommandMapList();
-        for (Map<String, Command> map : commandList) {
-            for (Command command : map.values()) {
-                System.out.println(command.toString());
-            }
-        }
+    public void testzPrintMainCommandList() throws Exception {
+        List<Command> commands = commandRegistry.getCommandList();
+        commands.forEach(command -> {
+            System.out.println(command.toString());
+            printSubCommands(command, " ↳ ");
+        });
+    }
 
+
+    private void printSubCommands(Command parentCommand, String tabAmount) {
+        if (parentCommand.hasSubCommand()) {
+            Map<String, Command> subCommands = parentCommand.getSubCommands();
+            Collections.unmodifiableCollection(subCommands.values()).forEach(command -> {
+                if (parentCommand.getName().equals(command.getName())) {
+                    System.out.println(tabAmount + " repeatable");
+                } else {
+                    System.out.println(tabAmount + command.toString());
+                    printSubCommands(command, tabAmount + tabAmount);
+                }
+            });
+        }
     }
 
 }

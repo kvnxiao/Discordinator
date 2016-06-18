@@ -1,4 +1,4 @@
-import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.MainCommand;
 
 import java.util.LinkedList;
 
@@ -8,11 +8,10 @@ import java.util.LinkedList;
  */
 public class SingleCommand {
 
-    @CommandAnnotation(
-            mainCommand = true,
+    @MainCommand(
             name = "single test",
             alias = {"single", "one"},
-            desc = "test for a single command"
+            desc = "single test"
     )
     public void singleCommand(LinkedList<String> args) {
         System.out.println(this.getClass().getName() + args.toString());
