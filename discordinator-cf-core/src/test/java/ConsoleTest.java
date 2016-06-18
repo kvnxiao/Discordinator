@@ -1,7 +1,13 @@
 import com.github.alphahelix00.discordinator.Discordinator;
+import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
 import com.github.alphahelix00.discordinator.utils.CommandHandler;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,24 +16,28 @@ import static org.junit.Assert.assertTrue;
  * Created on: 6/15/2016
  * Author:     Kevin Xiao
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ConsoleTest {
 
     @Test
-    public void testCommandRegistry() {
+    public void testaCommandRegistry() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
+        CommandHandler commandHandler = new CommandHandler();
         commandRegistry.addPrefix("!");
         commandRegistry.addPrefix("?");
+        commandHandler.registerAnnotatedCommands(new SingleCommand());
+        commandHandler.registerAnnotatedCommands(new MultiCommand());
+        commandHandler.registerAnnotatedCommands(new RepeatCommand());
         assertTrue(commandRegistry.containsPrefix("!"));
         assertTrue(commandRegistry.containsPrefix("?"));
-        assertFalse(commandRegistry.containsPrefix("~"));
-        assertTrue(commandRegistry.getPrefixes().size() == 2);
+        assertTrue(commandRegistry.containsPrefix("~"));
+        assertTrue(commandRegistry.getPrefixes().size() == 3);
     }
 
     @Test
-    public void testSingleCommand() throws Exception {
+    public void testaSingleCommand() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         CommandHandler commandHandler = new CommandHandler();
-        commandHandler.registerAnnotatedCommands(new SingleCommand());
         assertTrue(commandRegistry.commandExists("single", "!"));
         assertTrue(commandRegistry.commandExists("one", "!"));
         // Test for different alias calls
@@ -38,10 +48,9 @@ public class ConsoleTest {
     }
 
     @Test
-    public void testMultiCommand() throws Exception {
+    public void testbMultiCommand() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         CommandHandler commandHandler = new CommandHandler();
-        commandHandler.registerAnnotatedCommands(new MultiCommand());
         assertTrue(commandRegistry.commandExists("main", "?"));
         assertFalse(commandRegistry.commandExists("first", "!"));
         assertTrue(commandRegistry.commandExists("sub", "?"));
@@ -60,14 +69,25 @@ public class ConsoleTest {
     }
 
     @Test
-    public void testRepeatCommand() throws Exception {
+    public void testcRepeatCommand() throws Exception {
         CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
         CommandHandler commandHandler = new CommandHandler();
-        commandHandler.registerAnnotatedCommands(new RepeatCommand());
         assertTrue(commandRegistry.commandExists("rep", "~"));
         // Test for calling main commands that reference sub commands to themselves
         commandHandler.parseForCommands("~rep once");
         commandHandler.parseForCommands("~rep rep rep once");
+    }
+
+    @Test
+    public void testzCommandList() {
+        CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
+        List<Map<String, Command>> commandList = commandRegistry.getCommandMapList();
+        for (Map<String, Command> map : commandList) {
+            for (Command command : map.values()) {
+                System.out.println(command.toString());
+            }
+        }
+
     }
 
 }

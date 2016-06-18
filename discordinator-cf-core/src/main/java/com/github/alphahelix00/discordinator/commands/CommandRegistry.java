@@ -15,10 +15,12 @@ public class CommandRegistry {
 
     private final Set<String> prefixes;
     private final Map<String, Map<String, Command>> prefixToCommandsMap;
+    private final List<Map<String, Command>> commandList;
 
     public CommandRegistry() {
         prefixes = new HashSet<>();
         prefixToCommandsMap = new HashMap<>();
+        commandList = new ArrayList<>();
         this.addPrefix(CommandDefaults.PREFIX);
     }
 
@@ -34,6 +36,7 @@ public class CommandRegistry {
         if (prefixToCommandsMap.containsKey(prefix)) {
             Map<String, Command> existingCommandMap = prefixToCommandsMap.get(prefix);
             existingCommandMap.put(command.getName(), command);
+            commandList.add(existingCommandMap);
         } else {
             LOGGER.warn("Attempt to add command: [" + command.toString() + "] unsuccessful!");
         }
@@ -58,11 +61,6 @@ public class CommandRegistry {
      * @return unmodifiable list of all commands
      */
     public List<Map<String, Command>> getCommandMapList() {
-        Set<String> prefixes = Collections.unmodifiableMap(prefixToCommandsMap).keySet();
-        List<Map<String, Command>> commandList = new ArrayList<>();
-        for (String prefix : prefixes) {
-            commandList.add(prefixToCommandsMap.get(prefix));
-        }
         return Collections.unmodifiableList(commandList);
     }
 
