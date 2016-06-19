@@ -47,10 +47,10 @@ public class CommandRegistry {
     }
 
     /**
-     * Adds the specified prefix to the prefix set, if it does not already exist
+     * Adds the specified prefix to the prefix set
      * Creates a new command map for the specified prefix, if it does not already exist
      *
-     * @param identifier prefix identifer
+     * @param identifier prefix identifier
      */
     public void addPrefix(String identifier) {
         // Add prefix to set
@@ -80,13 +80,31 @@ public class CommandRegistry {
     }
 
     /**
-     * Checks if the command exists in the registry
+     * Checks if the command exists in the registry by providing
+     * a specified command name
      *
-     * @param alias  alias of command
      * @param prefix prefix attached to command
+     * @param name   name of command
+     * @return true if both prefix and command name exists in registry
+     */
+    public boolean commandExists(String prefix, String name) {
+        if (containsPrefix(prefix)) {
+            if (getCommandMap(prefix).containsKey(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the command exists in the registry by providing
+     * a specified command's alias
+     *
+     * @param prefix prefix attached to command
+     * @param alias  alias of command
      * @return true if prefix exists, and command alias exists under the prefixed map
      */
-    public boolean commandExists(String alias, String prefix) {
+    public boolean commandExistsAlias(String prefix, String alias) {
         if (containsPrefix(prefix)) {
             List<Command> commands = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
             for (Command command : commands) {
@@ -120,7 +138,7 @@ public class CommandRegistry {
      * @param alias  alias calling name of command
      * @return returns the command if it exists, else returns null
      */
-    public Command getMainCommandByAlias(String prefix, String alias) {
+    public Command getCommandByAlias(String prefix, String alias) {
         List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
         for (Command command : commandList) {
             if (command.isMainCommand() && command.getAlias().contains(alias)) {
@@ -131,7 +149,7 @@ public class CommandRegistry {
     }
 
     /**
-     * Returns the command when supplied the command's unique name and prefix
+     * Returns the command when supplied the prefix and unique name of the command
      *
      * @param name   name of the command
      * @param prefix prefix attached to command
@@ -148,7 +166,7 @@ public class CommandRegistry {
      * Gets the command map pertaining to a specific prefix
      *
      * @param prefix prefix identifier
-     * @return returns null if prefix does not exist
+     * @return returns command map for specified prefix, null if prefix does not exist
      */
     public Map<String, Command> getCommandMap(String prefix) {
         if (prefixToCommandsMap.containsKey(prefix)) {

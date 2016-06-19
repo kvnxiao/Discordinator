@@ -1,7 +1,10 @@
 package com.github.alphahelix00.discordinator.handler;
 
 import com.github.alphahelix00.discordinator.Discordinator;
-import com.github.alphahelix00.discordinator.commands.*;
+import com.github.alphahelix00.discordinator.commands.Command;
+import com.github.alphahelix00.discordinator.commands.CommandRegistry;
+import com.github.alphahelix00.discordinator.commands.MainCommand;
+import com.github.alphahelix00.discordinator.commands.SubCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,18 +27,21 @@ public abstract class AbstractCommandHandler {
 
     // Required implementations in sub-concrete classes
     public abstract void executeCommand(Command command, List<String> args, Object... extraArgs) throws IllegalAccessException, InvocationTargetException;
+
     protected abstract Command createMainCommand(MainCommand annotation, Object obj, Method method, boolean isMainCommand);
+
     protected abstract Command createSubCommand(SubCommand annotation, Object obj, Method method, boolean isMainCommand);
 
     /**
      * Returns true if message is a valid command by
      * checking for a message's prefix and subsequent argument
      *
-     * @param message message String to validate
-     * @return true if message has a valid prefix,
+     * @param message   message String to validate
+     * @param extraArgs extra arguments to pass in (any object)
+     * @return true if message was successfully validated for prefix and parsed
      * and subsequent argument is an existing command in registry
      */
-    public void validateMessage(String message, Object... extraArgs) {
+    public boolean validateMessage(String message, Object... extraArgs) {
         // Split message into an arguments list
         List<String> messageArgs = new LinkedList<>(Arrays.asList(message.split("\\s+")));
         // Get first argument from message and check for prefix match
@@ -49,23 +55,25 @@ public abstract class AbstractCommandHandler {
                 argFirst = argFirst.substring(identifier.length());
                 messageArgs.add(0, argFirst);
                 parseForCommands(prefix, messageArgs, extraArgs);
-                break;
+                return true;
             }
         }
+        return false;
     }
 
     /**
      * Parses the message arguments for commands and attempts to execute if successful
      *
-     * @param prefix
-     * @param messageArgs
+     * @param prefix      prefix identifier
+     * @param messageArgs list of arguments parsed from message
+     * @param extraArgs   extra arguments passed in (any object)
      */
-    public void parseForCommands(String prefix, List<String> messageArgs, Object... extraArgs) {
+    private void parseForCommands(String prefix, List<String> messageArgs, Object... extraArgs) {
         // Get first argument from message
         String argFirst = messageArgs.get(0);
         messageArgs.remove(0);
         // Use and prefix and first argument String as command alias to try and retrieve a command from registry
-        Command command = commandRegistry.getMainCommandByAlias(prefix, argFirst);
+        Command command = commandRegistry.getCommandByAlias(prefix, argFirst);
         if (command != null) {
             executeCommands(command, messageArgs, extraArgs);
         } else {
@@ -73,6 +81,13 @@ public abstract class AbstractCommandHandler {
         }
     }
 
+    /**
+     * Execute the command with given arguments
+     *
+     * @param command     command to execute
+     * @param messageArgs list of arguments parsed from message
+     * @param extraArgs   extra arguments passed in (any object)
+     */
     public void executeCommands(Command command, List<String> messageArgs, Object... extraArgs) {
         try {
             executeCommand(command, messageArgs, extraArgs);
@@ -142,16 +157,20 @@ public abstract class AbstractCommandHandler {
     private void registerMainCommands(Object obj, List<Method> methodsMain, List<Method> methodsSub) {
         for (Method method : methodsMain) {
             final MainCommand annotation = method.getAnnotation(MainCommand.class);
-            Command command = createMainCommand(annotation, obj, method, true);
-            // Check if command is a repeating command or if it has sub commands
-            if (command.isRepeating()) {
-                command.addSubCommand(command);
-                LOGGER.info("Registering repeating command: \"" + command.getName() + "\"");
-            } else if (command.hasSubCommand()) {
-                LOGGER.info("Registering main command: \"" + command.getName() + "\"");
-                registerSubCommands(obj, methodsSub, command);
+            if (!commandRegistry.commandExists(annotation.prefix(), annotation.name())) {
+                Command command = createMainCommand(annotation, obj, method, true);
+                // Check if command is a repeating command or if it has sub commands
+                if (command.isRepeating()) {
+                    command.addSubCommand(command);
+                    LOGGER.info("Registering repeating command: \"" + command.getName() + "\"");
+                } else if (command.hasSubCommand()) {
+                    LOGGER.info("Registering main command: \"" + command.getName() + "\"");
+                    registerSubCommands(obj, methodsSub, command);
+                } else {
+                    LOGGER.info("Registering main command: \"" + command.getName() + "\"");
+                }
+                commandRegistry.addCommand(command);
             }
-            commandRegistry.addCommand(command);
         }
     }
 
@@ -161,7 +180,7 @@ public abstract class AbstractCommandHandler {
             // Check and match each method annotation's name field with sub command name
             for (Method method : methodsSub) {
                 final SubCommand annotation = method.getAnnotation(SubCommand.class);
-                if (subCommandName.equals(annotation.name())) {
+                if (subCommandName.equals(annotation.name()) && !parentCommand.subCommandExists(annotation.prefix(), annotation.name())) {
                     Command command = createSubCommand(annotation, obj, method, false);
                     LOGGER.info("Registering sub command: \"" + command.getName() + "\" of parent \"" + parentCommand.getName() + "\"");
                     if (command.hasSubCommand()) {
