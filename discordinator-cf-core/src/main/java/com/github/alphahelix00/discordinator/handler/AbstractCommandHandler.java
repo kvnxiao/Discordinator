@@ -108,7 +108,7 @@ public abstract class AbstractCommandHandler {
         command.execute(args);
     }
 
-    public void registerAnnotatedCommands(Object obj) {
+    public List<String> registerAnnotatedCommands(Object obj) {
         List<Method> methodsMain = new ArrayList<>();
         List<Method> methodsSub = new ArrayList<>();
 
@@ -127,6 +127,16 @@ public abstract class AbstractCommandHandler {
         } else {
             LOGGER.warn("No main methods detected in " + obj.getClass().getSimpleName());
         }
+        return getMainCommandNames(methodsMain);
+    }
+
+    private List<String> getMainCommandNames(List<Method> methods) {
+        List<String> commandNames = new ArrayList<>();
+        for (Method method : methods) {
+            final MainCommand annotation = method.getAnnotation(MainCommand.class);
+            commandNames.add(annotation.name());
+        }
+        return Collections.unmodifiableList(commandNames);
     }
 
     private void registerMainCommands(Object obj, List<Method> methodsMain, List<Method> methodsSub) {
@@ -136,10 +146,11 @@ public abstract class AbstractCommandHandler {
             // Check if command is a repeating command or if it has sub commands
             if (command.isRepeating()) {
                 command.addSubCommand(command);
+                LOGGER.info("Registering repeating command: \"" + command.getName() + "\"");
             } else if (command.hasSubCommand()) {
+                LOGGER.info("Registering main command: \"" + command.getName() + "\"");
                 registerSubCommands(obj, methodsSub, command);
             }
-            LOGGER.info("Registered main command: \"" + command.getName() + "\"");
             commandRegistry.addCommand(command);
         }
     }
@@ -152,10 +163,10 @@ public abstract class AbstractCommandHandler {
                 final SubCommand annotation = method.getAnnotation(SubCommand.class);
                 if (subCommandName.equals(annotation.name())) {
                     Command command = createSubCommand(annotation, obj, method, false);
+                    LOGGER.info("Registering sub command: \"" + command.getName() + "\" of parent \"" + parentCommand.getName() + "\"");
                     if (command.hasSubCommand()) {
                         registerSubCommands(obj, methodsSub, command);
                     }
-                    LOGGER.info("Registered sub command: \"" + command.getName() + "\" of parent \"" + parentCommand.getName() + "\"");
                     parentCommand.addSubCommand(command);
                 }
             }
