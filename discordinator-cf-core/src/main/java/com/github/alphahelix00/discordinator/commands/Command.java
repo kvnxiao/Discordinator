@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created on: 6/15/2016
- * Author:     Kevin Xiao
+ * Created on:   6/15/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public abstract class Command implements CommandExecutor {
 
@@ -27,9 +27,13 @@ public abstract class Command implements CommandExecutor {
         return false;
     }
 
+    public boolean isRepeating() {
+        return getSubCommandNames().contains(getName());
+    }
+
     @Override
     public String toString() {
-        return getName() + " " + getAlias().toString() + " - " + getDesc();
+        return getName() + ": " + getAlias().toString() + " - " + getDesc();
     }
 
     public void addSubCommand(Command command) {

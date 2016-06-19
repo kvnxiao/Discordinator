@@ -6,8 +6,8 @@ import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
 /**
- * Author:      Kevin Xiao
- * Created on:  6/17/2016
+ * Created on:   6/17/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public class CommandListener implements IListener<MessageReceivedEvent> {
 
@@ -18,7 +18,7 @@ public class CommandListener implements IListener<MessageReceivedEvent> {
     public void handle(MessageReceivedEvent event) {
         String message = event.getMessage().getContent();
         if (commandRegistry.getPrefixes().contains(message.substring(0, 1))) {
-            commandHandler.parseForCommands(message, event);
+            // commandHandler.parseForCommands(message, event);
         }
     }
 }
