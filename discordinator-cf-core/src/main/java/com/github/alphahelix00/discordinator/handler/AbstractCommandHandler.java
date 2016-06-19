@@ -123,6 +123,12 @@ public abstract class AbstractCommandHandler {
         command.execute(args);
     }
 
+    public Command registerCommand(Command command) {
+        LOGGER.info("Registering main command: \"" + command.getName() + "\"");
+        commandRegistry.addCommand(command);
+        return command;
+    }
+
     public List<String> registerAnnotatedCommands(Object obj) {
         List<Method> methodsMain = new ArrayList<>();
         List<Method> methodsSub = new ArrayList<>();

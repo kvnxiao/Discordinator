@@ -1,7 +1,5 @@
 package com.github.alphahelix00.discordinator.d4j.handler;
 
-import com.github.alphahelix00.discordinator.Discordinator;
-import com.github.alphahelix00.discordinator.commands.CommandRegistry;
 import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
@@ -11,7 +9,6 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
  */
 public class CommandListener implements IListener<MessageReceivedEvent> {
 
-    private final CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
     private final CommandHandlerD4J commandHandler = CommandHandlerD4J.getInstance();
 
     @Override
