@@ -17,8 +17,6 @@ public class CommandListener implements IListener<MessageReceivedEvent> {
     @Override
     public void handle(MessageReceivedEvent event) {
         String message = event.getMessage().getContent();
-        if (commandRegistry.getPrefixes().contains(message.substring(0, 1))) {
-            // commandHandler.parseForCommands(message, event);
-        }
+        commandHandler.validateMessage(message, event);
     }
 }

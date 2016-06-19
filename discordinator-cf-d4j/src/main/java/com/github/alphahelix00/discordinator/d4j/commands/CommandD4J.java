@@ -14,6 +14,5 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J{
 
     @Override
     public void execute(List<String> args) throws IllegalAccessException, InvocationTargetException {
-
     }
 }
