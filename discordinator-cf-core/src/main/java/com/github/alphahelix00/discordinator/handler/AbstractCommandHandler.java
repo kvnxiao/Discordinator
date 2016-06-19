@@ -139,6 +139,7 @@ public abstract class AbstractCommandHandler {
             } else if (command.hasSubCommand()) {
                 registerSubCommands(obj, methodsSub, command);
             }
+            LOGGER.info("Registered main command: \"" + command.getName() + "\"");
             commandRegistry.addCommand(command);
         }
     }
@@ -154,6 +155,7 @@ public abstract class AbstractCommandHandler {
                     if (command.hasSubCommand()) {
                         registerSubCommands(obj, methodsSub, command);
                     }
+                    LOGGER.info("Registered sub command: \"" + command.getName() + "\" of parent \"" + parentCommand.getName() + "\"");
                     parentCommand.addSubCommand(command);
                 }
             }

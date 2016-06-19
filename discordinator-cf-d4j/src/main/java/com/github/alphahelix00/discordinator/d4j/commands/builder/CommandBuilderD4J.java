@@ -1,4 +1,10 @@
-package com.github.alphahelix00.discordinator.commands;
+package com.github.alphahelix00.discordinator.d4j.commands.builder;
+
+import com.github.alphahelix00.discordinator.commands.Command;
+import com.github.alphahelix00.discordinator.commands.CommandDefaults;
+import com.github.alphahelix00.discordinator.d4j.commands.CommandD4J;
+import com.github.alphahelix00.discordinator.d4j.commands.CommandExecutorD4J;
+import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,7 +16,7 @@ import java.util.List;
  * Created on:   6/18/2016
  * Author:       Kevin Xiao (github.com/alphahelix00)
  */
-public class CommandBuilder {
+public class CommandBuilderD4J {
 
     private String prefix = CommandDefaults.PREFIX;
     private String name;
@@ -19,17 +25,17 @@ public class CommandBuilder {
     private List<String> subCommandNames;
     private boolean isMainCommand = true;
 
-    private CommandBuilder(String name, String description) {
+    private CommandBuilderD4J(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public CommandBuilder(String name, String description, List<String> aliases) {
+    public CommandBuilderD4J(String name, String description, List<String> aliases) {
         this(name, description);
         this.aliases = aliases;
     }
 
-    public CommandBuilder(String name, String description, String... aliases) {
+    public CommandBuilderD4J(String name, String description, String... aliases) {
         this(name, description);
         // Supplied string array of aliases
         if (aliases.length > 0) {
@@ -41,30 +47,30 @@ public class CommandBuilder {
         }
     }
 
-    public CommandBuilder setPrefix(String prefix) {
+    public CommandBuilderD4J setPrefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
 
-    public CommandBuilder setSubCommandNames(List<String> subCommandNames) {
+    public CommandBuilderD4J setSubCommandNames(List<String> subCommandNames) {
         this.subCommandNames = subCommandNames;
         return this;
     }
 
-    public CommandBuilder setSubCommandNames(String... strings) {
+    public CommandBuilderD4J setSubCommandNames(String... strings) {
         if (strings.length > 0) {
             this.subCommandNames = Arrays.asList(strings);
         }
         return this;
     }
 
-    public CommandBuilder setIsMainCommand(boolean isMainCommand) {
+    public CommandBuilderD4J setIsMainCommand(boolean isMainCommand) {
         this.isMainCommand = isMainCommand;
         return this;
     }
 
     public Command build(Object object, Method method) {
-        return new Command() {
+        return new CommandD4J() {
             @Override
             public String getName() {
                 return name;
@@ -96,14 +102,14 @@ public class CommandBuilder {
             }
 
             @Override
-            public void execute(List<String> args) throws IllegalAccessException, InvocationTargetException {
-                method.invoke(object, args);
+            public void execute(List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
+                method.invoke(object, args, event);
             }
         };
     }
 
-    public Command build(CommandExecutor executor) {
-        return new Command() {
+    public Command build(CommandExecutorD4J executor) {
+        return new CommandD4J() {
             @Override
             public String getName() {
                 return name;
@@ -135,8 +141,8 @@ public class CommandBuilder {
             }
 
             @Override
-            public void execute(List<String> args) throws IllegalAccessException, InvocationTargetException {
-                executor.execute(args);
+            public void execute(List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
+                executor.execute(args, event);
             }
         };
     }
