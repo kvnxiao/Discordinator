@@ -29,14 +29,15 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
 
     @Override
     public void executeCommand(Command command, List<String> args, Object... extraArgs) throws IllegalAccessException, InvocationTargetException {
-        MessageReceivedEvent event = null;
         if (extraArgs[0] instanceof MessageReceivedEvent) {
-            event = (MessageReceivedEvent) extraArgs[0];
-        }
-        try {
-            ((CommandD4J) command).execute(args, event);
-        } catch (ClassCastException e) {
-            LOGGER.error("Unable to cast " + command.getName() + " as a D4J command");
+            try {
+                MessageReceivedEvent event = (MessageReceivedEvent) extraArgs[0];
+                LOGGER.info("Executing command: \"" + command.getPrefix()+ command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName()
+                        + "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\"");
+                ((CommandD4J) command).execute(args, event);
+            } catch (ClassCastException e) {
+                LOGGER.error("Unable to cast " + command.getName() + " as a D4J command");
+            }
         }
     }
 
