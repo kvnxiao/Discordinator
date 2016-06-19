@@ -6,12 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created on: 6/15/2016
- * Author:     Kevin Xiao
+ * Created on:   6/18/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface CommandAnnotation {
+public @interface SubCommand {
 
     String prefix() default CommandDefaults.PREFIX;
 
@@ -24,8 +24,6 @@ public @interface CommandAnnotation {
     boolean allowPrivateMessage() default CommandDefaults.ALLOW_PRIVATE_MESSAGES;
 
     boolean allowChannelMessage() default CommandDefaults.ALLOW_CHANNEL_MESSAGES;
-
-    boolean mainCommand() default CommandDefaults.MAIN_COMMAND;
 
     String name();
 

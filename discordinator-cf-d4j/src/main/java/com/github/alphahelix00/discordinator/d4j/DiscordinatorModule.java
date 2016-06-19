@@ -8,8 +8,8 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.modules.IModule;
 
 /**
- * Author:      Kevin Xiao
- * Created on:  6/17/2016
+ * Created on:   6/17/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public class DiscordinatorModule implements IModule {
 

@@ -1,43 +1,43 @@
-import com.github.alphahelix00.discordinator.commands.CommandAnnotation;
+import com.github.alphahelix00.discordinator.commands.MainCommand;
+import com.github.alphahelix00.discordinator.commands.SubCommand;
 
 import java.util.LinkedList;
 
 /**
- * Author:      Kevin Xiao
- * Created on:  6/16/2016
+ * Created on:   6/16/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public class MultiCommand {
 
-    @CommandAnnotation(
-            mainCommand = true,
+    @MainCommand(
             prefix = "?",
-            name = "main command",
+            name = "MultiCommand MAIN",
             alias = {"main", "first"},
-            desc = "test for a single command",
-            subCommands = {"sub command 1"}
+            desc = "main command",
+            subCommands = {"sub1"}
     )
     public void mainCommand(LinkedList<String> args) {
-        System.out.println(this.getClass().getName() + args.toString() + " MAIN COMMAND");
+        System.out.println(this.getClass().getName() + args.toString() + " MultiCommand test! primary");
     }
 
-    @CommandAnnotation(
-            name = "sub command 1",
+    @SubCommand(
+            name = "sub1",
             prefix = "?",
             alias = {"sub", "two"},
-            desc = "first sub",
-            subCommands = {"sub command 2"}
+            desc = "first subcommand of main command",
+            subCommands = {"sub2"}
     )
     public void subCommand(LinkedList<String> args) {
-        System.out.println(this.getClass().getName() + args.toString() + " SECONDARY COMMAND");
+        System.out.println(this.getClass().getName() + args.toString() + " MultiCommand test! secondary");
     }
 
-    @CommandAnnotation(
-            name = "sub command 2",
+    @SubCommand(
+            name = "sub2",
             prefix = "?",
             alias = {"sub", "three"},
-            desc = "second sub"
+            desc = "second subcommand of main command"
     )
     public void tertiaryCommand(LinkedList<String> args) {
-        System.out.println(this.getClass().getName() + args.toString() + " TERTIARY COMMAND");
+        System.out.println(this.getClass().getName() + args.toString() + " MultiCommand test! tertiary");
     }
 }

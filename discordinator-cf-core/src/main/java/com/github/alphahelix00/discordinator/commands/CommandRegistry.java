@@ -5,9 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+
 /**
- * Created on: 6/15/2016
- * Author:     Kevin Xiao
+ * Created on:   6/15/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public class CommandRegistry {
 
@@ -15,25 +16,31 @@ public class CommandRegistry {
 
     private final Set<String> prefixes;
     private final Map<String, Map<String, Command>> prefixToCommandsMap;
+    private final List<Command> mainCommandList;
 
     public CommandRegistry() {
         prefixes = new HashSet<>();
         prefixToCommandsMap = new HashMap<>();
+        mainCommandList = new ArrayList<>();
         this.addPrefix(CommandDefaults.PREFIX);
     }
 
     /**
      * Adds the specified command to the registry, under the proper prefixed map
-     * @param command       command to add
-     * @throws Exception
+     *
+     * @param command command to add
      */
-    public void addCommand(Command command) throws Exception {
+    public void addCommand(Command command) {
         // Add prefix before adding command to registry
         String prefix = command.getPrefix();
         this.addPrefix(prefix);
         if (prefixToCommandsMap.containsKey(prefix)) {
             Map<String, Command> existingCommandMap = prefixToCommandsMap.get(prefix);
-            existingCommandMap.put(command.getName(), command);
+            // Only one command with the same name may be added
+            if (!existingCommandMap.containsKey(command.getName())) {
+                existingCommandMap.put(command.getName(), command);
+                mainCommandList.add(command);
+            }
         } else {
             LOGGER.warn("Attempt to add command: [" + command.toString() + "] unsuccessful!");
         }
@@ -42,7 +49,8 @@ public class CommandRegistry {
     /**
      * Adds the specified prefix to the prefix set, if it does not already exist
      * Creates a new command map for the specified prefix, if it does not already exist
-     * @param identifier    prefix identifer
+     *
+     * @param identifier prefix identifer
      */
     public void addPrefix(String identifier) {
         // Add prefix to set
@@ -55,19 +63,16 @@ public class CommandRegistry {
 
     /**
      * Returns an unmodifiable list of all available commands in the command registry
+     *
      * @return unmodifiable list of all commands
      */
-    public List<Map<String, Command>> getCommandMapList() {
-        Set<String> prefixes = Collections.unmodifiableMap(prefixToCommandsMap).keySet();
-        List<Map<String, Command>> commandList = new ArrayList<>();
-        for (String prefix : prefixes) {
-            commandList.add(prefixToCommandsMap.get(prefix));
-        }
-        return Collections.unmodifiableList(commandList);
+    public List<Command> getCommandList() {
+        return Collections.unmodifiableList(mainCommandList);
     }
 
     /**
      * Returns an unmodifiable set of all prefixes in the command registry
+     *
      * @return unmodifiable set of all command prefixes
      */
     public Set<String> getPrefixes() {
@@ -76,9 +81,10 @@ public class CommandRegistry {
 
     /**
      * Checks if the command exists in the registry
-     * @param alias     alias of command
-     * @param prefix    prefix attached to command
-     * @return          true if prefix exists, and command alias exists under the prefixed map
+     *
+     * @param alias  alias of command
+     * @param prefix prefix attached to command
+     * @return true if prefix exists, and command alias exists under the prefixed map
      */
     public boolean commandExists(String alias, String prefix) {
         if (containsPrefix(prefix)) {
@@ -94,8 +100,9 @@ public class CommandRegistry {
 
     /**
      * Returns true if the supplied prefix is a member of the prefixes set
-     * @param identifier    prefix identifier
-     * @return              true if prefix is found in set
+     *
+     * @param identifier prefix identifier
+     * @return true if prefix is found in set
      */
     public boolean containsPrefix(String identifier) {
         for (String prefix : getPrefixes()) {
@@ -108,11 +115,12 @@ public class CommandRegistry {
 
     /**
      * Returns the main command when supplied the prefix and alias of the command
-     * @param alias     alias calling name of command
-     * @param prefix    prefix attached to command
-     * @return          returns the command if it exists, else returns null
+     *
+     * @param prefix prefix attached to command
+     * @param alias  alias calling name of command
+     * @return returns the command if it exists, else returns null
      */
-    public Command getMainCommandByAlias(String alias, String prefix) {
+    public Command getMainCommandByAlias(String prefix, String alias) {
         List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
         for (Command command : commandList) {
             if (command.isMainCommand() && command.getAlias().contains(alias)) {
@@ -124,9 +132,10 @@ public class CommandRegistry {
 
     /**
      * Returns the command when supplied the command's unique name and prefix
-     * @param name      name of the command
-     * @param prefix    prefix attached to command
-     * @return          returns the command if it exists, else returns null
+     *
+     * @param name   name of the command
+     * @param prefix prefix attached to command
+     * @return returns the command if it exists, else returns null
      */
     public Command getCommandByName(String name, String prefix) {
         if (getCommandMap(prefix).containsKey(name)) {
@@ -137,8 +146,9 @@ public class CommandRegistry {
 
     /**
      * Gets the command map pertaining to a specific prefix
-     * @param prefix    prefix identifier
-     * @return          returns null if prefix does not exist
+     *
+     * @param prefix prefix identifier
+     * @return returns null if prefix does not exist
      */
     public Map<String, Command> getCommandMap(String prefix) {
         if (prefixToCommandsMap.containsKey(prefix)) {

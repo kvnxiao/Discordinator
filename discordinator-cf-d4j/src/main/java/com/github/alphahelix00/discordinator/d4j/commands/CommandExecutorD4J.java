@@ -5,8 +5,8 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import java.util.LinkedList;
 
 /**
- * Author:      Kevin Xiao
- * Created on:  6/17/2016
+ * Created on:   6/17/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 @FunctionalInterface
 public interface CommandExecutorD4J {
