@@ -10,9 +10,10 @@ Although originally intended for use in conjunction with other Discord API wrapp
 
 ##Functionality
 - Annotated command definitions with multiple command prefix support
+- Command definitions through a Builder class
 - Support for a "main" command and (optional) "sub-commands" that are called after the main command
 - **To-do list:**
-  - Add support for registering commands in forms other than annotations (e.g. builder, read from files)
+  - Add support for registering commands in forms other than annotations (e.g. read from files)
 
 ##Contribution
 Discordinator is still a **[Work In Progress]**

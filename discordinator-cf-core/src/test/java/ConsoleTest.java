@@ -1,7 +1,7 @@
 import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
-import com.github.alphahelix00.discordinator.utils.CommandHandler;
+import com.github.alphahelix00.discordinator.handler.CommandHandler;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -15,14 +15,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created on: 6/15/2016
- * Author:     Kevin Xiao
+ * Created on:   6/15/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ConsoleTest {
 
     private CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
-    private CommandHandler commandHandler = new CommandHandler();
+    private CommandHandler commandHandler = CommandHandler.getInstance();
 
     @Before
     public void setUp() throws Exception {
@@ -45,10 +45,10 @@ public class ConsoleTest {
         assertTrue(commandRegistry.commandExists("single", "!"));
         assertTrue(commandRegistry.commandExists("one", "!"));
         // Test for different alias calls
-        commandHandler.parseForCommands("!single");
-        commandHandler.parseForCommands("!one");
+        commandHandler.validateMessage("!single");
+        commandHandler.validateMessage("!one");
         // Test for extra arguments and extra whitespace
-        commandHandler.parseForCommands("!single one abc    def");
+        commandHandler.validateMessage("!single one abc    def");
     }
 
     @Test
@@ -59,23 +59,23 @@ public class ConsoleTest {
         assertFalse(commandRegistry.commandExists("two", "?"));
         assertFalse(commandRegistry.commandExists("asdf", "!"));
         // Test for calling subcommands without main command
-        commandHandler.parseForCommands("?sub test (should not do anything)");
+        commandHandler.validateMessage("?sub test (should not do anything)");
         // Test for calling main commands and then sub commands
-        commandHandler.parseForCommands("?main");
-        commandHandler.parseForCommands("?main none");
-        commandHandler.parseForCommands("?main none sub");
-        commandHandler.parseForCommands("?main sub");
-        commandHandler.parseForCommands("!main two");
+        commandHandler.validateMessage("?main");
+        commandHandler.validateMessage("?main none");
+        commandHandler.validateMessage("?main none sub");
+        commandHandler.validateMessage("?main sub");
+        commandHandler.validateMessage("!main two");
         // Test for tertiary subcommand call
-        commandHandler.parseForCommands("?first sub sub");
+        commandHandler.validateMessage("?first sub sub");
     }
 
     @Test
     public void testcRepeatCommand() throws Exception {
         assertTrue(commandRegistry.commandExists("rep", "~"));
         // Test for calling main commands that reference sub commands to themselves
-        commandHandler.parseForCommands("~rep once");
-        commandHandler.parseForCommands("~rep rep rep once");
+        commandHandler.validateMessage("~rep once");
+        commandHandler.validateMessage("~rep rep rep once");
     }
 
     @Test

@@ -6,8 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created on: 6/15/2016
- * Author:     Kevin Xiao
+ * Created on:   6/15/2016
+ * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public class Discordinator {
 

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>discordinator-cf</artifactId>
         <groupId>com.github.alphahelix00</groupId>
-        <version>0.6</version>
+        <version>0.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.github.alphahelix00</groupId>
             <artifactId>discordinator-cf-core</artifactId>
-            <version>0.6</version>
+            <version>0.7</version>
         </dependency>
     </dependencies>
 
