@@ -1,8 +1,5 @@
 package com.github.alphahelix00.discordinator.d4j;
 
-import com.github.alphahelix00.discordinator.Discordinator;
-import com.github.alphahelix00.discordinator.commands.CommandRegistry;
-import com.github.alphahelix00.discordinator.d4j.handler.CommandHandlerD4J;
 import com.github.alphahelix00.discordinator.d4j.handler.CommandListener;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.modules.IModule;
@@ -13,31 +10,22 @@ import sx.blah.discord.modules.IModule;
  */
 public class DiscordinatorModule implements IModule {
 
-    private static final DiscordinatorModule instance = new DiscordinatorModule();
-    private IDiscordClient discordClient;
-    private final CommandRegistry commandRegistry;
-    private final CommandHandlerD4J commandHandler;
+    private IDiscordClient client;
     private final CommandListener commandListener = new CommandListener();
 
-    private DiscordinatorModule() {
-        this.commandRegistry = Discordinator.getCommandRegistry();
-        this.commandHandler = CommandHandlerD4J.getInstance();
-    }
-
-    public static DiscordinatorModule getInstance() {
-        return instance;
+    public DiscordinatorModule() {
     }
 
     @Override
     public boolean enable(IDiscordClient iDiscordClient) {
-        this.discordClient = iDiscordClient;
-        handleMessages(discordClient);
-        return false;
+        this.client = iDiscordClient;
+        handleMessages(client);
+        return true;
     }
 
     @Override
     public void disable() {
-        disableMessageHandle(discordClient);
+        disableMessageHandle(client);
     }
 
     @Override

@@ -42,8 +42,8 @@ public class ConsoleTest {
 
     @Test
     public void testaSingleCommand() throws Exception {
-        assertTrue(commandRegistry.commandExists("single", "!"));
-        assertTrue(commandRegistry.commandExists("one", "!"));
+        assertTrue(commandRegistry.commandExistsAlias("!", "single"));
+        assertTrue(commandRegistry.commandExistsAlias("!", "one"));
         // Test for different alias calls
         commandHandler.validateMessage("!single");
         commandHandler.validateMessage("!one");
@@ -53,11 +53,11 @@ public class ConsoleTest {
 
     @Test
     public void testbMultiCommand() throws Exception {
-        assertTrue(commandRegistry.commandExists("main", "?"));
-        assertFalse(commandRegistry.commandExists("first", "!"));
-        assertFalse(commandRegistry.commandExists("sub", "?"));
-        assertFalse(commandRegistry.commandExists("two", "?"));
-        assertFalse(commandRegistry.commandExists("asdf", "!"));
+        assertTrue(commandRegistry.commandExistsAlias("?", "main"));
+        assertFalse(commandRegistry.commandExistsAlias("!", "first"));
+        assertFalse(commandRegistry.commandExistsAlias("?", "sub"));
+        assertFalse(commandRegistry.commandExistsAlias("?", "two"));
+        assertFalse(commandRegistry.commandExistsAlias("!", "asdf"));
         // Test for calling subcommands without main command
         commandHandler.validateMessage("?sub test (should not do anything)");
         // Test for calling main commands and then sub commands
@@ -72,7 +72,7 @@ public class ConsoleTest {
 
     @Test
     public void testcRepeatCommand() throws Exception {
-        assertTrue(commandRegistry.commandExists("rep", "~"));
+        assertTrue(commandRegistry.commandExistsAlias("~", "rep"));
         // Test for calling main commands that reference sub commands to themselves
         commandHandler.validateMessage("~rep once");
         commandHandler.validateMessage("~rep rep rep once");

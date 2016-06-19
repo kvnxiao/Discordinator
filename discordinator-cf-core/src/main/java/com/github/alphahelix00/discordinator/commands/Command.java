@@ -21,10 +21,7 @@ public abstract class Command implements CommandExecutor {
     public abstract String getPrefix();
 
     public boolean hasSubCommand() {
-        if (getSubCommandNames() != null) {
-            return getSubCommandNames().size() > 0;
-        }
-        return false;
+        return getSubCommandNames() != null && getSubCommandNames().size() > 0;
     }
 
     public boolean isRepeating() {
@@ -38,6 +35,15 @@ public abstract class Command implements CommandExecutor {
 
     public void addSubCommand(Command command) {
         this.subCommandMap.put(command.getName(), command);
+    }
+
+    public boolean subCommandExists(String prefix, String name) {
+        for (Command command : getSubCommands().values()) {
+            if (command.getPrefix().equals(prefix) && command.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, Command> getSubCommands() {
