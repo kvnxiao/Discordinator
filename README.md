@@ -53,6 +53,8 @@ Call `#registerAnnotatedCommands` on the class object from the `AbstractCommandH
 By default, the prefix is not a required field within the annotation (defaults to `!`), and the method name can be declared as anything.
 
 ```java
+public class Commands {
+
     @MainCommand(
             prefix = "?",
             name = "Main Command",
@@ -84,6 +86,8 @@ By default, the prefix is not a required field within the annotation (defaults t
     public void tertiaryCommand(List<String> args, MessageReceivedEvent event) {
         // DO SUB SUB COMMAND STUFF
     }
+
+}
 ```
 
 ######Concrete Example:
