@@ -1,6 +1,7 @@
 ![Discordinator Logo](http://i.imgur.com/sQUmvOw.png)
 ---
 [![Build Status](https://drone.io/github.com/alphahelix00/Discordinator.java/status.png)](https://drone.io/github.com/alphahelix00/Discordinator.java/latest)
+[![](https://jitpack.io/v/alphahelix00/discordinator.java.svg?style=flat-square)](https://jitpack.io/#alphahelix00/discordinator.java)
 
 An easily adoptable command framework primarily intended for Discord bots.
 
@@ -208,6 +209,35 @@ And somewhere else, make sure to register the newly created command class
 ```java
 CommandHandlerD4J#registerCommand(new PingCommand());
 ```
+
+## Usage - Discord4J
+To import into your own project, download the jar files from [release](https://github.com/alphahelix00/Discordinator.java/releases) and add as external dependencies within your IDE, or see below for Maven import using jitpack.io. 
+
+##### In the future, a module .jar file will be provided that can be loaded into a Discord4J bot by simply placing it in the modules directory of the bot
+
+For now, to enable the module, call `ModuleLoader.addModuleClass(DiscordinatorModule.class);` within your bot class or main class, _before_ the bot logs into Discord.
+
+### Maven
+
+###### pom.xml
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+
+```xml
+<dependency>
+    <groupId>com.github.alphahelix00</groupId>
+    <artifactId>discordinator-cf-d4j</artifactId>
+    <version>@VERSION_NUM@</version>
+</dependency>
+```
+
+Replace `@VERSION_NUM@` with the version you want to use.
 
 ## To-do List
 - Permissions
