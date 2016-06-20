@@ -1,5 +1,7 @@
 ![Discordinator Logo](http://i.imgur.com/sQUmvOw.png)
 ---
+[![Build Status](https://drone.io/github.com/alphahelix00/Discordinator.java/status.png)](https://drone.io/github.com/alphahelix00/Discordinator.java/latest)
+
 An easily adoptable command framework primarily intended for Discord bots.
 
 ## About
