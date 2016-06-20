@@ -7,7 +7,7 @@
     <groupId>com.github.alphahelix00</groupId>
     <artifactId>discordinator-cf</artifactId>
     <packaging>pom</packaging>
-    <version>0.8.3</version>
+    <version>0.8.4</version>
     <modules>
         <module>discordinator-cf-core</module>
         <module>discordinator-cf-d4j</module>
@@ -31,34 +31,6 @@
             <url>https://jitpack.io</url>
         </repository>
     </repositories>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 
     <dependencies>
         <dependency>

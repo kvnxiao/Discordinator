@@ -18,7 +18,7 @@ The main two classes within the framework are:
   - Storage of all commands
 - `CommandHandler` *(the ordinator)*
   - Validate and parse Strings for command calls
-  - Calls upon the registry to register commands (annotated methods / CommandBuilder / Command class extension)
+  - Calls upon the registry to register and execute commands (annotated methods / CommandBuilder / Command class extension)
 
 ### Commands
 Commands are split into _**main**_ and _**sub**_ commands. Main commands must have unique names and are registered into the command registry. Sub commands are entirely optional, and are tied to their parent commands by their unique names. All commands are called by their _**alias**_ but defined by their _**name**_ For a sub command to properly function, it is crucial that the name of the sub commands is set within the parent command. Take the following as an example:

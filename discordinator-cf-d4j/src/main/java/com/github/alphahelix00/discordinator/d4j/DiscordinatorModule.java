@@ -1,6 +1,6 @@
 package com.github.alphahelix00.discordinator.d4j;
 
-import com.github.alphahelix00.discordinator.d4j.handler.CommandListener;
+import com.github.alphahelix00.discordinator.d4j.handler.CommandListenerD4J;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.modules.IModule;
 
@@ -11,7 +11,7 @@ import sx.blah.discord.modules.IModule;
 public class DiscordinatorModule implements IModule {
 
     private IDiscordClient client;
-    private final CommandListener commandListener = new CommandListener();
+    private final CommandListenerD4J commandListener = new CommandListenerD4J();
 
     public DiscordinatorModule() {
     }

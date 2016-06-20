@@ -7,7 +7,7 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
  * Created on:   6/17/2016
  * Author:       Kevin Xiao (github.com/alphahelix00)
  */
-public class CommandListener implements IListener<MessageReceivedEvent> {
+public class CommandListenerD4J implements IListener<MessageReceivedEvent> {
 
     private final CommandHandlerD4J commandHandler = CommandHandlerD4J.getInstance();
 
