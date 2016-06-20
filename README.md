@@ -33,7 +33,7 @@ Depending on the supplied argument, conditional statements can be made to
 Note that one can choose to have a main command do nothing and have only its sub commands do something. So in the above example, we can choose to not print out `"Greetings."`, so that only `"Hi."` is displayed when `greet hi` is parsed.
 
 #### Command chaining
-The number of sub commands is not limited to just one in a main command. A sub command can also have a parent command that is a sub command to another command. As long as the defining hierarchy is correct, there should be no problem having any number of sub command depth.
+There is no limit to the number of sub commands, provided that all the names are unique. It is also possible for a sub command to be the sub command of another sub command. As long as the defining hierarchy is followed, there should be no problem having any number of sub command depth.
 
 ##### Repeatable (Self-chaining) Commands
 A command can also be defined as self-chaining or repeatable if the command name is included within the subCommands: `(name = "repeat", alias = "repeat", subCommands = "repeat")`
@@ -47,8 +47,8 @@ There are several ways of defining a command (the below examples are illustrated
 ---
 
 ##### Annotations
-A class containing method defined with `@MainCommand` (and for sub commands, `@SubCommand`) can have those methods registered as a command in the CommandRegistry.
-Call `#registerAnnotatedCommands` from your `AbstractCommandHandler` implementation (e.g. use `CommandHandlerD4J.registerAnnotatedCommands(_objWithAnnotatedMethods_)` if you are using the Discord4J module)
+A class containing methods defined with `@MainCommand` (and for sub commands, `@SubCommand`) can have those methods registered as a command in the CommandRegistry.
+Call `#registerAnnotatedCommands` on the class object from the `AbstractCommandHandler` implementation (e.g. use `CommandHandlerD4J.registerAnnotatedCommands(_objWithAnnotatedMethods_)` if you are using the Discord4J module)
 
 By default, the prefix is not a required field within the annotation (defaults to `!`), and the method name can be declared as anything.
 
@@ -60,7 +60,7 @@ By default, the prefix is not a required field within the annotation (defaults t
             desc = "main command",
             subCommands = {"sub1"}
     )
-    public void mainCommand(LinkedList<String> args) {
+    public void mainCommand(List<String> args, MessageReceivedEvent event) {
         // DO MAIN COMMAND STUFF
     }
 
@@ -71,7 +71,7 @@ By default, the prefix is not a required field within the annotation (defaults t
             desc = "first subcommand of main command",
             subCommands = {"sub2"}
     )
-    public void subCommand(LinkedList<String> args) {
+    public void subCommand(List<String> args, MessageReceivedEvent event) {
         // DO SUB COMMAND STUFF
     }
 
@@ -81,7 +81,7 @@ By default, the prefix is not a required field within the annotation (defaults t
             alias = {"sub", "three"},
             desc = "second subcommand of main command"
     )
-    public void tertiaryCommand(LinkedList<String> args) {
+    public void tertiaryCommand(List<String> args, MessageReceivedEvent event) {
         // DO SUB SUB COMMAND STUFF
     }
 ```
@@ -119,7 +119,8 @@ CommandHandlerD4J#registerAnnotatedCommands(new Commands());
 
 ##### CommandBuilder
 Using the CommandBuilder, supply the proper information to create a new command and add it to the registry.
-Within the .build() method call, the use of Java 8 lambda expressions is recommended  as it takes in a functional interface CommandExecutor class
+Within the .build() method call, the use of Java 8 lambda expressions is recommended  as it takes in a functional interface CommandExecutor object
+
 ```java
 commandHandler.registerCommand(new CommandBuilderD4J("ping", "bot says pong!", "ping")
         .setPrefix("?").setIsMainCommand(true).build((args, event) -> {
@@ -139,7 +140,8 @@ commandHandler.registerCommand(new CommandBuilderD4J("ping", "bot says pong!", "
 ---
 
 ##### User-defined commands extending Command class
-One can define their own commands that extend the (library module specific) `Command` class. For example, if using the Discord4J module, create a class that extends `CommandD4J`:
+One can also define commands by extending the (library specific) `Command` class. For example, if using the Discord4J module, create a class that extends `CommandD4J`:
+
 ```java
 public class PingCommand extends CommandD4J {
 
