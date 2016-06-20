@@ -1,5 +1,7 @@
 # Discordinator.java
-A Java based command framework intended for Discord bots.
+![Discordinator Logo](http://i.imgur.com/sQUmvOw.png)
+
+An easily adoptable command framework primarily intended for Discord bots.
 
 ## About
 
