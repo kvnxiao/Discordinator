@@ -198,4 +198,12 @@ public abstract class AbstractCommandHandler {
         }
     }
 
+    public void enableCommand() {
+
+    }
+
+    public void disableCommand() {
+
+    }
+
 }

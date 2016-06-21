@@ -1,4 +1,4 @@
-package com.github.alphahelix00.discordinator.d4j;
+package com.github.alphahelix00.discordinator.d4j.commands;
 
 import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
