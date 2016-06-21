@@ -16,7 +16,14 @@
             <groupId>com.github.austinv11</groupId>
             <artifactId>Discord4j</artifactId>
             <version>dev-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy -->
+        <!--<dependency>-->
+            <!--<groupId>org.codehaus.groovy</groupId>-->
+            <!--<artifactId>groovy</artifactId>-->
+            <!--<version>2.4.7</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>com.github.alphahelix00</groupId>
             <artifactId>discordinator-cf-core</artifactId>
@@ -24,5 +31,31 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

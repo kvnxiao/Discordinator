@@ -30,7 +30,7 @@ public class DiscordinatorModule implements IModule {
 
     @Override
     public String getName() {
-        return "Discordinator.java Module";
+        return "Discordinator Command Framework";
     }
 
     @Override
@@ -40,7 +40,7 @@ public class DiscordinatorModule implements IModule {
 
     @Override
     public String getVersion() {
-        return getClass().getPackage().getImplementationVersion();
+        return getClass().getPackage().getImplementationVersion() + " https://github.com/alphahelix00/Discordinator";
     }
 
     @Override
