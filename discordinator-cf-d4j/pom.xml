@@ -5,7 +5,7 @@
     <parent>
         <artifactId>discordinator-cf</artifactId>
         <groupId>com.github.alphahelix00</groupId>
-        <version>0.8.4</version>
+        <version>0.8.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,14 +16,40 @@
             <groupId>com.github.austinv11</groupId>
             <artifactId>Discord4j</artifactId>
             <version>dev-SNAPSHOT</version>
-            <classifier>shaded</classifier>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.alphahelix00</groupId>
             <artifactId>discordinator-cf-core</artifactId>
-            <version>0.8.4</version>
+            <version>0.8.5</version>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

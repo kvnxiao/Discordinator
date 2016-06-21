@@ -1,7 +1,7 @@
 ![Discordinator Logo](http://i.imgur.com/sQUmvOw.png)
 ---
-[![Build Status](https://drone.io/github.com/alphahelix00/Discordinator.java/status.png)](https://drone.io/github.com/alphahelix00/Discordinator.java/latest)
-[![](https://jitpack.io/v/alphahelix00/discordinator.java.svg?style=flat-square)](https://jitpack.io/#alphahelix00/discordinator.java)
+[![Build Status](https://drone.io/github.com/alphahelix00/Discordinator/status.png)](https://drone.io/github.com/alphahelix00/Discordinator/latest)
+[![](https://jitpack.io/v/alphahelix00/Discordinator.svg?style=flat-square)](https://jitpack.io/#alphahelix00/Discordinator)
 
 An easily adoptable command framework primarily intended for Discord bots.
 
@@ -232,12 +232,12 @@ For now, to enable the module, call `ModuleLoader.addModuleClass(DiscordinatorMo
 ```xml
 <dependency>
     <groupId>com.github.alphahelix00</groupId>
-    <artifactId>discordinator-cf-d4j</artifactId>
+    <artifactId>Discordinator</artifactId>
     <version>@VERSION_NUM@</version>
 </dependency>
 ```
 
-Replace `@VERSION_NUM@` with the version you want to use.
+Replace `@VERSION_NUM@` with the version you want to use. To use the latest development snapshot, use `dev-SNAPSHOT`.
 
 ## To-do List
 - Permissions
