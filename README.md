@@ -232,12 +232,12 @@ For now, to enable the module, call `ModuleLoader.addModuleClass(DiscordinatorMo
 ```xml
 <dependency>
     <groupId>com.github.alphahelix00</groupId>
-    <artifactId>discordinator-cf-d4j</artifactId>
+    <artifactId>Discordinator</artifactId>
     <version>@VERSION_NUM@</version>
 </dependency>
 ```
 
-Replace `@VERSION_NUM@` with the version you want to use.
+Replace `@VERSION_NUM@` with the version you want to use. To use the latest development snapshot, use `dev-SNAPSHOT`.
 
 ## To-do List
 - Permissions
