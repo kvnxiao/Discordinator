@@ -1,5 +1,8 @@
 package com.github.alphahelix00.discordinator.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,13 +14,21 @@ import java.util.Map;
  */
 public abstract class Command implements CommandExecutor {
 
+    protected Logger LOGGER = LoggerFactory.getLogger(Command.class);
+
     private Map<String, Command> subCommandMap = new HashMap<>();
+    private boolean isEnabled = true;
 
     public abstract String getName();
+
     public abstract String getDesc();
+
     public abstract List<String> getAlias();
+
     public abstract List<String> getSubCommandNames();
+
     public abstract boolean isMainCommand();
+
     public abstract String getPrefix();
 
     public boolean hasSubCommand() {
@@ -48,5 +59,13 @@ public abstract class Command implements CommandExecutor {
 
     public Map<String, Command> getSubCommands() {
         return Collections.unmodifiableMap(subCommandMap);
+    }
+
+    public void setEnabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
     }
 }

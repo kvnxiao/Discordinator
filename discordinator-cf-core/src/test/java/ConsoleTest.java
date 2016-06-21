@@ -79,7 +79,7 @@ public class ConsoleTest {
     }
 
     @Test
-    public void testzPrintMainCommandList() throws Exception {
+    public void testdPrintMainCommandList() throws Exception {
         List<Command> commands = commandRegistry.getCommandList();
         commands.forEach(command -> {
             System.out.println(command.toString());
@@ -87,6 +87,15 @@ public class ConsoleTest {
         });
     }
 
+    @Test
+    public void testeToggleCommand() {
+        System.out.println(CommandHandler.getCommand("?main sub"));
+        commandHandler.validateMessage("?main sub");
+        commandHandler.validateMessage("!disable ?main sub");
+        commandHandler.validateMessage("?main sub");
+        commandHandler.validateMessage("!enable ?main sub");
+        commandHandler.validateMessage("?main sub");
+    }
 
     private void printSubCommands(Command parentCommand, String tabAmount) {
         if (parentCommand.hasSubCommand()) {
