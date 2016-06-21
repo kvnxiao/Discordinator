@@ -1,6 +1,7 @@
 import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
+import com.github.alphahelix00.discordinator.commands.Commands;
 import com.github.alphahelix00.discordinator.handler.CommandHandler;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -29,6 +30,8 @@ public class ConsoleTest {
         commandHandler.registerAnnotatedCommands(new SingleCommand());
         commandHandler.registerAnnotatedCommands(new MultiCommand());
         commandHandler.registerAnnotatedCommands(new RepeatCommand());
+        commandHandler.registerCommand(new Commands.Enable());
+        commandHandler.registerCommand(new Commands.Disable());
     }
 
     @Test

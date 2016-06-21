@@ -18,7 +18,7 @@ import java.util.*;
  */
 public abstract class AbstractCommandHandler {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger("CommandHandler");
+    private static final Logger LOGGER = LoggerFactory.getLogger("CommandHandler");
     protected static final CommandRegistry commandRegistry = Discordinator.getCommandRegistry();
 
     protected AbstractCommandHandler() {
@@ -152,9 +152,11 @@ public abstract class AbstractCommandHandler {
         return Collections.unmodifiableList(commandNames);
     }
 
-    public static Command registerCommand(Command command) {
-        LOGGER.info("Registering main command: \"" + command.getName() + "\"");
-        commandRegistry.addCommand(command);
+    public Command registerCommand(Command command) {
+        if (!commandRegistry.commandExists(command.getPrefix(), command.getName())) {
+            LOGGER.info("Registering main command: \"" + command.getName() + "\"");
+            commandRegistry.addCommand(command);
+        }
         return command;
     }
 

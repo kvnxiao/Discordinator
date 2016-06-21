@@ -1,8 +1,5 @@
 package com.github.alphahelix00.discordinator.commands;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +10,6 @@ import java.util.Map;
  * Author:       Kevin Xiao (github.com/alphahelix00)
  */
 public abstract class Command implements CommandExecutor {
-
-    protected Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     private Map<String, Command> subCommandMap = new HashMap<>();
     private boolean isEnabled = true;
