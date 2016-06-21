@@ -5,7 +5,7 @@
     <parent>
         <artifactId>discordinator-cf</artifactId>
         <groupId>com.github.alphahelix00</groupId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,13 +15,12 @@
         <dependency>
             <groupId>com.github.austinv11</groupId>
             <artifactId>Discord4j</artifactId>
-            <version>dev-SNAPSHOT</version>
-            <classifier>shaded</classifier>
+            <version>2.4.9</version>
         </dependency>
         <dependency>
             <groupId>com.github.alphahelix00</groupId>
             <artifactId>discordinator-cf-core</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <version>0.9.0</version>
         </dependency>
     </dependencies>
 
