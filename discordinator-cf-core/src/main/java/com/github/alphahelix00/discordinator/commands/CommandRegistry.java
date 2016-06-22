@@ -62,12 +62,12 @@ public class CommandRegistry {
     }
 
     /**
-     * Returns an unmodifiable list of all available commands in the command registry
+     * Returns a mutable list of all available commands in the command registry
      *
-     * @return unmodifiable list of all commands
+     * @return mutable list of all commands
      */
     public List<Command> getCommandList() {
-        return Collections.unmodifiableList(mainCommandList);
+        return mainCommandList;
     }
 
     /**

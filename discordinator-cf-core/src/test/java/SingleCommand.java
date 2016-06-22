@@ -12,7 +12,7 @@ import java.util.*;
 public class SingleCommand {
 
     @MainCommand(
-            name = "SingleCommand MAIN",
+            name = "Single",
             alias = {"single", "one"},
             desc = "single command test"
     )

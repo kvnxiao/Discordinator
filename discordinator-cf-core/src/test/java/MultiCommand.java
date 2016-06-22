@@ -11,7 +11,7 @@ public class MultiCommand {
 
     @MainCommand(
             prefix = "?",
-            name = "MultiCommand MAIN",
+            name = "Multi-Command",
             alias = {"main", "first"},
             desc = "main command",
             subCommands = {"sub1"}

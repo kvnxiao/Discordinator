@@ -10,10 +10,10 @@ public class RepeatCommand {
 
     @MainCommand(
             prefix = "~",
-            name = "RepeatCommand MAIN",
+            name = "Repeat",
             alias = {"rep"},
             desc = "test for repeating command",
-            subCommands = {"repeat command"}
+            subCommands = {"Repeat"}
     )
     public void repeatCommand(LinkedList<String> args) {
         System.out.println(this.getClass().getName() + args.toString() + " Repeat test!");

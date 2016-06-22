@@ -261,13 +261,17 @@ public abstract class AbstractCommandHandler {
     }
 
     public static void enableCommand(Command command) {
-        LOGGER.info("Enabling command: " + command.toString());
-        command.setEnabled(true);
+        if (!command.essential() && !command.isEnabled()) {
+            LOGGER.info("Enabling command: " + command.toString());
+            command.setEnabled(true);
+        }
     }
 
     public static void disableCommand(Command command) {
-        LOGGER.info("Disabling command: " + command.toString());
-        command.setEnabled(false);
+        if (!command.essential() && command.isEnabled()) {
+            LOGGER.info("Disabling command: " + command.toString());
+            command.setEnabled(false);
+        }
     }
 
 }

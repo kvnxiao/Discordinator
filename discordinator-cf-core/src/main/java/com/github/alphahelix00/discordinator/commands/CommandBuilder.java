@@ -18,6 +18,7 @@ public class CommandBuilder {
     private List<String> aliases;
     private List<String> subCommandNames;
     private boolean isMainCommand = true;
+    private boolean essential = false;
 
     private CommandBuilder(String name, String description) {
         this.name = name;
@@ -65,6 +66,12 @@ public class CommandBuilder {
 
     public Command build(Object object, Method method) {
         return new Command() {
+
+            @Override
+            public boolean essential() {
+                return essential;
+            }
+
             @Override
             public String getName() {
                 return name;
@@ -104,6 +111,12 @@ public class CommandBuilder {
 
     public Command build(CommandExecutor executor) {
         return new Command() {
+
+            @Override
+            public boolean essential() {
+                return essential;
+            }
+
             @Override
             public String getName() {
                 return name;

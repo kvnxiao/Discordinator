@@ -32,6 +32,7 @@ public class ConsoleTest {
         commandHandler.registerAnnotatedCommands(new RepeatCommand());
         commandHandler.registerCommand(new Commands.Enable());
         commandHandler.registerCommand(new Commands.Disable());
+        commandHandler.registerCommand(new Commands.Help());
     }
 
     @Test
@@ -85,19 +86,25 @@ public class ConsoleTest {
     public void testdPrintMainCommandList() throws Exception {
         List<Command> commands = commandRegistry.getCommandList();
         commands.forEach(command -> {
-            System.out.println(command.toString());
+            System.out.println(command.getAlias() +  " - " + command.getDesc());
             printSubCommands(command, " ↳ ");
         });
     }
 
     @Test
+    public void testdeHelpList() throws Exception {
+        commandHandler.validateMessage("!help");
+    }
+
+    @Test
     public void testeToggleCommand() {
-        System.out.println(CommandHandler.getCommand("?main sub"));
         commandHandler.validateMessage("?main sub");
         commandHandler.validateMessage("!disable ?main sub");
         commandHandler.validateMessage("?main sub");
         commandHandler.validateMessage("!enable ?main sub");
         commandHandler.validateMessage("?main sub");
+        commandHandler.validateMessage("!disable !disable");
+        commandHandler.validateMessage("!help ?main sub");
     }
 
     private void printSubCommands(Command parentCommand, String tabAmount) {
@@ -107,7 +114,7 @@ public class ConsoleTest {
                 if (parentCommand.getName().equals(command.getName())) {
                     System.out.println(tabAmount + " repeatable");
                 } else {
-                    System.out.println(tabAmount + command.toString());
+                    System.out.println(tabAmount + command.getAlias() + " - " + command.getDesc());
                     printSubCommands(command, tabAmount + tabAmount);
                 }
             });
