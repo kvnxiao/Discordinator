@@ -2,10 +2,10 @@ package com.github.alphahelix00.discordinator.commands;
 
 import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.handler.AbstractCommandHandler;
-import com.google.common.base.Joiner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Author:      Kevin Xiao
@@ -139,7 +139,6 @@ public class EssentialCommands {
         private final String DESCRIPTION = "lists all commands, or more info about a specific command";
         private final String[] ALIAS = {"help"};
         private final String PREFIX = "!";
-        private static final Joiner NEW_LINE = Joiner.on("\r\n");
 
         @Override
         public boolean essential() {
@@ -194,7 +193,7 @@ public class EssentialCommands {
             text.add(String.format("%1$-12s: %2$s", "Command Name", command.getName()));
             text.add(String.format("%1$-12s: %2$s", "Description", command.getDesc()));
             text.add(String.format("%1$-12s: %2$s", "Sub-Commands", (command.getSubCommandNames() != null) ? command.getSubCommandNames().toString() : "N/A"));
-            return NEW_LINE.join(text);
+            return String.join("\r\n", text);
         }
 
         protected static String getCommandListQuote() {
@@ -203,7 +202,7 @@ public class EssentialCommands {
             text.add("[COMMAND LIST]");
             Collections.sort(mainCommands, Command.COMMAND_COMPARATOR);
             mainCommands.forEach(command -> text.add(command.toFormattedString()));
-            return NEW_LINE.join(text);
+            return String.join("\r\n", text);
         }
     }
 }

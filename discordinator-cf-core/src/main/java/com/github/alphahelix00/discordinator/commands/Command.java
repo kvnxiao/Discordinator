@@ -1,8 +1,7 @@
 package com.github.alphahelix00.discordinator.commands;
 
-import com.google.common.base.Joiner;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created on:   6/15/2016
@@ -14,7 +13,6 @@ public abstract class Command implements CommandExecutor {
 
     private Map<String, Command> subCommandMap = new HashMap<>();
     private boolean isEnabled = true;
-    private final Joiner joiner = Joiner.on(", " + getPrefix());
 
     public abstract String getName();
 
@@ -71,7 +69,7 @@ public abstract class Command implements CommandExecutor {
     public String toFormattedString() {
         List<String> aliasList = getAlias();
         Collections.sort(aliasList);
-        String aliases = getPrefix() + joiner.join(aliasList);
+        String aliases = getPrefix() + String.join(", " + getPrefix());
         String description = getDesc();
         return String.format("%1$-16s - %2$s", aliases, description);
     }
