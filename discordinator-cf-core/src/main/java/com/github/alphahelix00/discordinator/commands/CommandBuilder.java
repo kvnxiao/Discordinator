@@ -109,6 +109,11 @@ public class CommandBuilder {
         };
     }
 
+    public CommandBuilder setEssential(boolean isEssential) {
+        this.essential = isEssential;
+        return this;
+    }
+
     public Command build(CommandExecutor executor) {
         return new Command() {
 
