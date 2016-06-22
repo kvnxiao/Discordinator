@@ -1,7 +1,7 @@
 import com.github.alphahelix00.discordinator.Discordinator;
 import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.CommandRegistry;
-import com.github.alphahelix00.discordinator.commands.Commands;
+import com.github.alphahelix00.discordinator.commands.EssentialCommands;
 import com.github.alphahelix00.discordinator.handler.CommandHandler;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -30,9 +30,9 @@ public class ConsoleTest {
         commandHandler.registerAnnotatedCommands(new SingleCommand());
         commandHandler.registerAnnotatedCommands(new MultiCommand());
         commandHandler.registerAnnotatedCommands(new RepeatCommand());
-        commandHandler.registerCommand(new Commands.Enable());
-        commandHandler.registerCommand(new Commands.Disable());
-        commandHandler.registerCommand(new Commands.Help());
+        commandHandler.registerCommand(new EssentialCommands.Enable());
+        commandHandler.registerCommand(new EssentialCommands.Disable());
+        commandHandler.registerCommand(new EssentialCommands.Help());
     }
 
     @Test
@@ -104,7 +104,11 @@ public class ConsoleTest {
         commandHandler.validateMessage("!enable ?main sub");
         commandHandler.validateMessage("?main sub");
         commandHandler.validateMessage("!disable !disable");
-        commandHandler.validateMessage("!help ?main sub");
+    }
+
+    @Test
+    public void testfEssentialCommands() {
+        commandHandler.validateMessage("!help !help");
     }
 
     private void printSubCommands(Command parentCommand, String tabAmount) {

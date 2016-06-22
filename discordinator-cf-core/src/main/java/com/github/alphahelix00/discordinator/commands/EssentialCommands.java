@@ -11,7 +11,7 @@ import java.util.*;
  * Author:      Kevin Xiao
  * Created on:  6/21/2016
  */
-public class Commands {
+public class EssentialCommands {
 
     public static Command goToCommand(List<String> argsOriginal) {
         List<String> args = new ArrayList<>(argsOriginal);
@@ -189,15 +189,15 @@ public class Commands {
             }
         }
 
-        private static String getCommandInfoQuote(Command command) {
+        protected static String getCommandInfoQuote(Command command) {
             List<String> text = new ArrayList<>();
             text.add(String.format("%1$-12s: %2$s", "Command Name", command.getName()));
             text.add(String.format("%1$-12s: %2$s", "Description", command.getDesc()));
-            text.add(String.format("%1$-12s: %2$s", "Sub-commands", command.getSubCommandNames().toString()));
+            text.add(String.format("%1$-12s: %2$s", "Sub-Commands", (command.getSubCommandNames() != null) ? command.getSubCommandNames().toString() : "N/A"));
             return NEW_LINE.join(text);
         }
 
-        private static String getCommandListQuote() {
+        protected static String getCommandListQuote() {
             List<Command> mainCommands = Discordinator.getCommandRegistry().getCommandList();
             List<String> text = new ArrayList<>();
             text.add("[COMMAND LIST]");

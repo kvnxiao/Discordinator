@@ -1,5 +1,6 @@
 package com.github.alphahelix00.discordinator.d4j.handler;
 
+import com.github.alphahelix00.discordinator.d4j.commands.EssentialCommandsD4J;
 import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
@@ -10,6 +11,12 @@ import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 public class CommandListenerD4J implements IListener<MessageReceivedEvent> {
 
     private final CommandHandlerD4J commandHandler = CommandHandlerD4J.getInstance();
+
+    public CommandListenerD4J() {
+        commandHandler.registerCommand(new EssentialCommandsD4J.DisableD4J());
+        commandHandler.registerCommand(new EssentialCommandsD4J.EnableD4J());
+        commandHandler.registerCommand(new EssentialCommandsD4J.HelpD4J());
+    }
 
     @Override
     public void handle(MessageReceivedEvent event) {

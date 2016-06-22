@@ -1,9 +1,11 @@
 package com.github.alphahelix00.discordinator.d4j.handler;
 
 import com.github.alphahelix00.discordinator.commands.Command;
+import com.github.alphahelix00.discordinator.commands.CommandExecutor;
 import com.github.alphahelix00.discordinator.commands.MainCommand;
 import com.github.alphahelix00.discordinator.commands.SubCommand;
 import com.github.alphahelix00.discordinator.d4j.commands.CommandD4J;
+import com.github.alphahelix00.discordinator.d4j.commands.CommandExecutorD4J;
 import com.github.alphahelix00.discordinator.d4j.commands.builder.CommandBuilderD4J;
 import com.github.alphahelix00.discordinator.handler.AbstractCommandHandler;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
@@ -34,7 +36,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 MessageReceivedEvent event = (MessageReceivedEvent) extraArgs[0];
                 LOGGER.info("Executing command: \"" + command.getPrefix()+ command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName()
                         + "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\"");
-                ((CommandD4J) command).execute(args, event);
+                ((CommandExecutorD4J) command).execute(args, event);
             } catch (ClassCastException e) {
                 LOGGER.error("Unable to cast " + command.getName() + " as a D4J command");
             }
