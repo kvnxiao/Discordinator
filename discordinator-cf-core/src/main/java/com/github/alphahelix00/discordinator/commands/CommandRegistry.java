@@ -157,7 +157,7 @@ public class CommandRegistry {
      * @param prefix prefix attached to command
      * @return returns the command if it exists, else returns null
      */
-    public Command getCommandByName(String name, String prefix) {
+    public Command getCommandByName(String prefix, String name) {
         if (getCommandMap(prefix).containsKey(name)) {
             return getCommandMap(prefix).get(name);
         }
