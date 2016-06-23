@@ -139,10 +139,12 @@ public class CommandRegistry {
      * @return returns the command if it exists, else returns null
      */
     public Command getCommandByAlias(String prefix, String alias) {
-        List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
-        for (Command command : commandList) {
-            if (command.isMainCommand() && command.getAlias().contains(alias)) {
-                return command;
+        if (getPrefixes().contains(prefix)) {
+            List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
+            for (Command command : commandList) {
+                if (command.isMainCommand() && command.getAlias().contains(alias)) {
+                    return command;
+                }
             }
         }
         return null;

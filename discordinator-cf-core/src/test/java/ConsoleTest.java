@@ -107,6 +107,13 @@ public class ConsoleTest {
     }
 
     @Test
+    public void testfRandomMessages() {
+        commandHandler.validateMessage("asdf 124a afo; j2qo3q;fj ;oajf o;j");
+        commandHandler.validateMessage("is this working?");
+        commandHandler.validateMessage("I'm not quite sure that I understand...");
+    }
+
+    @Test
     public void testfEssentialCommands() {
         commandHandler.validateMessage("!help !help");
     }
