@@ -45,10 +45,9 @@ public abstract class AbstractCommandHandler {
         // Split message into an arguments list
         List<String> messageArgs = splitMessage(message);
         // Get first argument from message and check for prefix match
-        if (!messageArgs.isEmpty()) {
+        if (messageArgs != null && !messageArgs.isEmpty()) {
             String prefix = messageArgs.get(0);
             messageArgs.remove(0);
-
             parseForCommands(prefix, messageArgs, extraArgs);
             return true;
         }
@@ -242,17 +241,11 @@ public abstract class AbstractCommandHandler {
 
     public static List<String> splitMessage(String message) {
         // Split message into an arguments list
-        List<String> messageArgs = new LinkedList<>(Arrays.asList(message.split("\\s+")));
-        // Get first argument from message and check for prefix match
-        String argFirst = messageArgs.get(0);
-        messageArgs.remove(0);
-        String prefix;
-
-        for (String identifier : commandRegistry.getPrefixes()) {
-            if (argFirst.startsWith(identifier)) {
-                prefix = identifier;
-                argFirst = argFirst.substring(identifier.length());
-                messageArgs.add(0, argFirst);
+        List<String> messageArgs = new ArrayList<>();
+        for (String prefix : commandRegistry.getPrefixes()) {
+            if (message.startsWith(prefix)) {
+                message = message.substring(prefix.length());
+                messageArgs = new ArrayList<>(Arrays.asList(message.split("\\s+")));
                 messageArgs.add(0, prefix);
                 return messageArgs;
             }

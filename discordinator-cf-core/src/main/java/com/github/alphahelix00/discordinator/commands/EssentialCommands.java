@@ -13,20 +13,6 @@ import java.util.stream.Collectors;
  */
 public class EssentialCommands {
 
-    public static Command goToCommand(List<String> argsOriginal) {
-        List<String> args = new ArrayList<>(argsOriginal);
-        String mainCommand = args.get(0);
-        args.remove(0);
-
-        Command command = null;
-        List<String> mainCommandArgs = AbstractCommandHandler.splitMessage(mainCommand);
-        if (!mainCommandArgs.isEmpty()) {
-            args.add(0, mainCommandArgs.get(1));
-            command = AbstractCommandHandler.getCommand(mainCommandArgs.get(0), args);
-        }
-        return command;
-    }
-
     public static class Enable extends Command {
 
         private final String NAME = "Enable Command";
@@ -78,6 +64,7 @@ public class EssentialCommands {
                 }
             }
         }
+
     }
 
     public static class Disable extends Command {
@@ -205,4 +192,19 @@ public class EssentialCommands {
             return String.join("\r\n", text);
         }
     }
+
+    public static Command goToCommand(List<String> argsOriginal) {
+        List<String> args = new ArrayList<>(argsOriginal);
+        String mainCommand = args.get(0);
+        args.remove(0);
+
+        Command command = null;
+        List<String> mainCommandArgs = AbstractCommandHandler.splitMessage(mainCommand);
+        if (!mainCommandArgs.isEmpty()) {
+            args.add(0, mainCommandArgs.get(1));
+            command = AbstractCommandHandler.getCommand(mainCommandArgs.get(0), args);
+        }
+        return command;
+    }
+
 }

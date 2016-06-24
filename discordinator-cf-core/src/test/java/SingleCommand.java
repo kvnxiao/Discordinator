@@ -1,9 +1,6 @@
-import com.github.alphahelix00.discordinator.commands.Command;
 import com.github.alphahelix00.discordinator.commands.MainCommand;
-import com.github.alphahelix00.discordinator.handler.AbstractCommandHandler;
-import com.github.alphahelix00.discordinator.handler.CommandHandler;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Created on:   6/16/2016
@@ -16,7 +13,7 @@ public class SingleCommand {
             alias = {"single", "one"},
             desc = "single command test"
     )
-    public void singleCommand(LinkedList<String> args) {
+    public void singleCommand(List<String> args) {
         System.out.println(this.getClass().getName() + args.toString() + " SingleCommand test!");
     }
 

@@ -9,7 +9,16 @@ import java.util.stream.Collectors;
  */
 public abstract class Command implements CommandExecutor {
 
-    public static final CommandComparator COMMAND_COMPARATOR = new CommandComparator();
+    public static final Comparator<Command> COMMAND_COMPARATOR = (o1, o2) -> {
+        List<String> o1alias = o1.getAlias(), o2alias = o2.getAlias();
+        Collections.sort(o1alias);
+        Collections.sort(o2alias);
+        if (o1.getPrefix().equals(o2.getPrefix())) {
+            return o1alias.get(0).compareTo(o2alias.get(0));
+        } else {
+            return o1.getPrefix().compareTo(o2.getPrefix());
+        }
+    };
 
     private Map<String, Command> subCommandMap = new HashMap<>();
     private boolean isEnabled = true;
@@ -69,23 +78,9 @@ public abstract class Command implements CommandExecutor {
     public String toFormattedString() {
         List<String> aliasList = getAlias();
         Collections.sort(aliasList);
-        String aliases = getPrefix() + String.join(", " + getPrefix());
+        String aliases = getPrefix() + String.join(", " + getPrefix(), aliasList);
         String description = getDesc();
         return String.format("%1$-16s - %2$s", aliases, description);
-    }
-
-    public static class CommandComparator implements Comparator<Command> {
-        @Override
-        public int compare(Command o1, Command o2) {
-            List<String> o1alias = o1.getAlias(), o2alias = o2.getAlias();
-            Collections.sort(o1alias);
-            Collections.sort(o2alias);
-            if (o1.getPrefix().equals(o2.getPrefix())) {
-                return o1alias.get(0).compareTo(o2alias.get(0));
-            } else {
-                return o1.getPrefix().compareTo(o2.getPrefix());
-            }
-        }
     }
 
 }
