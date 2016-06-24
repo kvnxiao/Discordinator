@@ -1,6 +1,6 @@
 import com.github.alphahelix00.discordinator.commands.MainCommand;
 
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created on:   6/16/2016
@@ -9,11 +9,12 @@ import java.util.LinkedList;
 public class SingleCommand {
 
     @MainCommand(
-            name = "SingleCommand MAIN",
+            name = "Single",
             alias = {"single", "one"},
             desc = "single command test"
     )
-    public void singleCommand(LinkedList<String> args) {
+    public void singleCommand(List<String> args) {
         System.out.println(this.getClass().getName() + args.toString() + " SingleCommand test!");
     }
+
 }

@@ -1,6 +1,6 @@
 import com.github.alphahelix00.discordinator.commands.MainCommand;
 
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created on:   6/16/2016
@@ -10,12 +10,12 @@ public class RepeatCommand {
 
     @MainCommand(
             prefix = "~",
-            name = "RepeatCommand MAIN",
+            name = "Repeat",
             alias = {"rep"},
             desc = "test for repeating command",
-            subCommands = {"repeat command"}
+            subCommands = {"Repeat"}
     )
-    public void repeatCommand(LinkedList<String> args) {
+    public void repeatCommand(List<String> args) {
         System.out.println(this.getClass().getName() + args.toString() + " Repeat test!");
     }
 }

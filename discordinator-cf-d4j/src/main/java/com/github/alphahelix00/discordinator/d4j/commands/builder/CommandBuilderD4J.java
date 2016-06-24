@@ -24,6 +24,7 @@ public class CommandBuilderD4J {
     private List<String> aliases;
     private List<String> subCommandNames;
     private boolean isMainCommand = true;
+    private boolean essential = false;
 
     private CommandBuilderD4J(String name, String description) {
         this.name = name;
@@ -69,8 +70,18 @@ public class CommandBuilderD4J {
         return this;
     }
 
+    public CommandBuilderD4J setEssential(boolean isEssential) {
+        this.essential = isEssential;
+        return this;
+    }
+
     public Command build(Object object, Method method) {
         return new CommandD4J() {
+            @Override
+            public boolean essential() {
+                return essential;
+            }
+
             @Override
             public String getName() {
                 return name;
@@ -110,6 +121,11 @@ public class CommandBuilderD4J {
 
     public Command build(CommandExecutorD4J executor) {
         return new CommandD4J() {
+            @Override
+            public boolean essential() {
+                return essential;
+            }
+
             @Override
             public String getName() {
                 return name;

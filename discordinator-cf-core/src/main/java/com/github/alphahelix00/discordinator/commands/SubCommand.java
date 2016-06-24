@@ -25,6 +25,8 @@ public @interface SubCommand {
 
     boolean allowChannelMessage() default CommandDefaults.ALLOW_CHANNEL_MESSAGES;
 
+    boolean essential() default CommandDefaults.ESSENTIAL;
+
     String name();
 
     String[] alias();

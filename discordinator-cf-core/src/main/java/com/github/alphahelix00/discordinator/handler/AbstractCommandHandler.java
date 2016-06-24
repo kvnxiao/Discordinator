@@ -43,20 +43,13 @@ public abstract class AbstractCommandHandler {
      */
     public boolean validateMessage(String message, Object... extraArgs) {
         // Split message into an arguments list
-        List<String> messageArgs = new LinkedList<>(Arrays.asList(message.split("\\s+")));
+        List<String> messageArgs = splitMessage(message);
         // Get first argument from message and check for prefix match
-        String argFirst = messageArgs.get(0);
-        messageArgs.remove(0);
-        String prefix;
-
-        for (String identifier : commandRegistry.getPrefixes()) {
-            if (argFirst.startsWith(identifier)) {
-                prefix = identifier;
-                argFirst = argFirst.substring(identifier.length());
-                messageArgs.add(0, argFirst);
-                parseForCommands(prefix, messageArgs, extraArgs);
-                return true;
-            }
+        if (messageArgs != null && !messageArgs.isEmpty()) {
+            String prefix = messageArgs.get(0);
+            messageArgs.remove(0);
+            parseForCommands(prefix, messageArgs, extraArgs);
+            return true;
         }
         return false;
     }
@@ -77,7 +70,7 @@ public abstract class AbstractCommandHandler {
         if (command != null) {
             executeCommands(command, messageArgs, extraArgs);
         } else {
-            LOGGER.warn("Request to execute command \"" + prefix + " " + argFirst + "\" not found in registry!");
+            LOGGER.warn("Request to execute command \"" + prefix + argFirst + "\" not found in registry!");
         }
     }
 
@@ -89,25 +82,29 @@ public abstract class AbstractCommandHandler {
      * @param extraArgs   extra arguments passed in (any object)
      */
     public void executeCommands(Command command, List<String> messageArgs, Object... extraArgs) {
-        try {
-            executeCommand(command, messageArgs, extraArgs);
-        } catch (IllegalAccessException e) {
-            LOGGER.error("IllegalAccessException in attempting to execute command " + command.getName(), e);
-        } catch (InvocationTargetException e) {
-            LOGGER.error("InvocationTargetException in attempting to execute command " + command.getName(), e);
-        } finally {
-            // Check if current command has sub command
-            if (command.hasSubCommand() && messageArgs.size() > 0) {
-                // Get next argument from message
-                String subCommandAlias = messageArgs.get(0);
-                messageArgs.remove(0);
-                // Iterate through list of sub commands and check if alias of those commands contain specific argument
-                Collections.unmodifiableCollection(command.getSubCommands().values()).forEach(subCommand -> {
-                    if (subCommand.getAlias().contains(subCommandAlias)) {
-                        executeCommands(subCommand, messageArgs, extraArgs);
-                    }
-                });
+        if (command.isEnabled()) {
+            try {
+                executeCommand(command, messageArgs, extraArgs);
+            } catch (IllegalAccessException e) {
+                LOGGER.error("IllegalAccessException in attempting to execute command " + command.getName(), e);
+            } catch (InvocationTargetException e) {
+                LOGGER.error("InvocationTargetException in attempting to execute command " + command.getName(), e);
+            } finally {
+                // Check if current command has sub command
+                if (command.hasSubCommand() && !messageArgs.isEmpty()) {
+                    // Get next argument from message
+                    String subCommandAlias = messageArgs.get(0);
+                    messageArgs.remove(0);
+                    // Iterate through list of sub commands and check if alias of those commands contain specific argument
+                    Collections.unmodifiableCollection(command.getSubCommands().values()).forEach(subCommand -> {
+                        if (subCommand.getAlias().contains(subCommandAlias)) {
+                            executeCommands(subCommand, messageArgs, extraArgs);
+                        }
+                    });
+                }
             }
+        } else {
+            LOGGER.warn(command.toString() + " is disabled and will not be executed!");
         }
     }
 
@@ -121,12 +118,6 @@ public abstract class AbstractCommandHandler {
      */
     public void executeCommand(Command command, List<String> args) throws IllegalAccessException, InvocationTargetException {
         command.execute(args);
-    }
-
-    public Command registerCommand(Command command) {
-        LOGGER.info("Registering main command: \"" + command.getName() + "\"");
-        commandRegistry.addCommand(command);
-        return command;
     }
 
     public List<String> registerAnnotatedCommands(Object obj) {
@@ -143,7 +134,7 @@ public abstract class AbstractCommandHandler {
         }
 
         // Create and register commands from the main and sub methods
-        if (methodsMain.size() > 0) {
+        if (!methodsMain.isEmpty()) {
             registerMainCommands(obj, methodsMain, methodsSub);
         } else {
             LOGGER.warn("No main methods detected in " + obj.getClass().getSimpleName());
@@ -158,6 +149,14 @@ public abstract class AbstractCommandHandler {
             commandNames.add(annotation.name());
         }
         return Collections.unmodifiableList(commandNames);
+    }
+
+    public Command registerCommand(Command command) {
+        if (!commandRegistry.commandExists(command.getPrefix(), command.getName())) {
+            LOGGER.info("Registering main command: \"" + command.getName() + "\"");
+            commandRegistry.addCommand(command);
+        }
+        return command;
     }
 
     private void registerMainCommands(Object obj, List<Method> methodsMain, List<Method> methodsSub) {
@@ -195,6 +194,76 @@ public abstract class AbstractCommandHandler {
                     parentCommand.addSubCommand(command);
                 }
             }
+        }
+    }
+
+    public static Command getCommand(String message) {
+        List<String> args = splitMessage(message);
+        if (!args.isEmpty()) {
+            String prefix = args.get(0);
+            args.remove(0);
+
+            // Gets the main command alias first
+            return getCommand(prefix, args);
+        }
+        return null;
+    }
+
+    public static Command getCommand(String prefix, List<String> args) {
+        // Gets the main command alias first
+        String argFirst = args.get(0);
+        args.remove(0);
+
+        // Use and prefix and first argument String as command alias to try and retrieve a command from registry
+        Command command = commandRegistry.getCommandByAlias(prefix, argFirst);
+        if (command != null) {
+            return (!args.isEmpty()) ? getSubCommand(command, args) : command;
+        }
+        return null;
+    }
+
+    private static Command getSubCommand(Command parentCommand, List<String> args) {
+        // Get the next sub command alias from args
+        String subCommandAlias = args.get(0);
+        args.remove(0);
+        // Iterate through list of sub commands and check if alias of those commands contain specific argument
+        for (Command command : Collections.unmodifiableCollection(parentCommand.getSubCommands().values())) {
+            if (command.getAlias().contains(subCommandAlias)) {
+                if (!args.isEmpty()) {
+                    return getSubCommand(command, args);
+                } else {
+                    return command;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static List<String> splitMessage(String message) {
+        // Split message into an arguments list
+        List<String> messageArgs = new ArrayList<>();
+        for (String prefix : commandRegistry.getPrefixes()) {
+            if (message.startsWith(prefix)) {
+                message = message.substring(prefix.length());
+                messageArgs = new ArrayList<>(Arrays.asList(message.split("\\s+")));
+                messageArgs.add(0, prefix);
+                return messageArgs;
+            }
+        }
+        return messageArgs;
+    }
+
+    public static void enableCommand(Command command) {
+        if (!command.essential() && !command.isEnabled()) {
+            LOGGER.info("Enabling command: " + command.toString());
+            command.setEnabled(true);
+        }
+    }
+
+    public static void disableCommand(Command command) {
+        if (!command.essential() && command.isEnabled()) {
+            LOGGER.info("Disabling command: " + command.toString());
+            command.setEnabled(false);
         }
     }
 

@@ -11,6 +11,5 @@ public class CommandDefaults {
     public static final String PERMISSION = "default";
     public static final boolean ALLOW_PRIVATE_MESSAGES = false;
     public static final boolean ALLOW_CHANNEL_MESSAGES = true;
-    public static final boolean MAIN_COMMAND = false;
-
+    public static final boolean ESSENTIAL = false;
 }

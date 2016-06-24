@@ -62,12 +62,12 @@ public class CommandRegistry {
     }
 
     /**
-     * Returns an unmodifiable list of all available commands in the command registry
+     * Returns a mutable list of all available commands in the command registry
      *
-     * @return unmodifiable list of all commands
+     * @return mutable list of all commands
      */
     public List<Command> getCommandList() {
-        return Collections.unmodifiableList(mainCommandList);
+        return mainCommandList;
     }
 
     /**
@@ -139,10 +139,12 @@ public class CommandRegistry {
      * @return returns the command if it exists, else returns null
      */
     public Command getCommandByAlias(String prefix, String alias) {
-        List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
-        for (Command command : commandList) {
-            if (command.isMainCommand() && command.getAlias().contains(alias)) {
-                return command;
+        if (getPrefixes().contains(prefix)) {
+            List<Command> commandList = Collections.unmodifiableList(new ArrayList<>(prefixToCommandsMap.get(prefix).values()));
+            for (Command command : commandList) {
+                if (command.isMainCommand() && command.getAlias().contains(alias)) {
+                    return command;
+                }
             }
         }
         return null;
@@ -155,7 +157,7 @@ public class CommandRegistry {
      * @param prefix prefix attached to command
      * @return returns the command if it exists, else returns null
      */
-    public Command getCommandByName(String name, String prefix) {
+    public Command getCommandByName(String prefix, String name) {
         if (getCommandMap(prefix).containsKey(name)) {
             return getCommandMap(prefix).get(name);
         }
