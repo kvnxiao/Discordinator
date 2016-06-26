@@ -1,16 +1,16 @@
 package com.github.alphahelix00.discordinator.d4j.commands.builder;
 
-import com.github.alphahelix00.discordinator.commands.Command;
-import com.github.alphahelix00.discordinator.commands.CommandDefaults;
 import com.github.alphahelix00.discordinator.d4j.commands.CommandD4J;
 import com.github.alphahelix00.discordinator.d4j.commands.CommandExecutorD4J;
+import com.github.alphahelix00.ordinator.commands.Command;
+import com.github.alphahelix00.ordinator.commands.CommandDefaults;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.util.MessageBuilder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created on:   6/18/2016
@@ -18,147 +18,102 @@ import java.util.List;
  */
 public class CommandBuilderD4J {
 
-    private String prefix = CommandDefaults.PREFIX;
-    private String name;
-    private String description;
+    private boolean isMain = CommandDefaults.ENABLED;
+    private boolean isEssential = CommandDefaults.ESSENTIAL;
+    private boolean isEnabled = CommandDefaults.ENABLED;
+    private String prefix = "!";
+    private final String name, description;
     private List<String> aliases;
-    private List<String> subCommandNames;
-    private boolean isMainCommand = true;
-    private boolean essential = false;
+    private Map<String, Command> subCommandMap = new HashMap<>();
+    private Map<String, String> subCommandNames = new HashMap<>();
+    private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
+    private boolean requireMention = false;
+    private boolean allowPrivateMessage = false;
 
-    private CommandBuilderD4J(String name, String description) {
+    public static CommandBuilderD4J builder(final String name, final String description) {
+        return new CommandBuilderD4J(name, description);
+    }
+
+    private CommandBuilderD4J(final String name, final String description) {
         this.name = name;
         this.description = description;
+        this.aliases = Collections.singletonList(name);
     }
 
-    public CommandBuilderD4J(String name, String description, List<String> aliases) {
-        this(name, description);
-        this.aliases = aliases;
+    public CommandBuilderD4J addSubCommand(Command subCommand) {
+        String name = subCommand.getName();
+        this.subCommandMap.put(name, subCommand);
+        this.subCommandNames.put(name, name);
+        return this;
     }
 
-    public CommandBuilderD4J(String name, String description, String... aliases) {
-        this(name, description);
-        // Supplied string array of aliases
+    public CommandBuilderD4J subCommandNames(String... names) {
+        for (String name : names) {
+            subCommandNames.put(name, name);
+        }
+        return this;
+    }
+
+    public CommandBuilderD4J alias(String... aliases) {
         if (aliases.length > 0) {
             this.aliases = Arrays.asList(aliases);
         } else {
-            // If by chance the aliases argument was empty, set alias to the command name (first portion split by white space)
-            this.aliases = new ArrayList<>(1);
-            this.aliases.add(name.split("\\s+")[0]);
+            this.aliases = Collections.singletonList(name.split("\\s+")[0]);
         }
+        return this;
     }
 
-    public CommandBuilderD4J setPrefix(String prefix) {
+    public CommandBuilderD4J essential(boolean isEssential) {
+        this.isEssential = isEssential;
+        return this;
+    }
+
+    public CommandBuilderD4J isMain(boolean isMain) {
+        this.isMain = isMain;
+        return this;
+    }
+
+    public CommandBuilderD4J enabled(boolean isEnabled) {
+        this.isEnabled = isEnabled;
+        return this;
+    }
+
+    public CommandBuilderD4J prefix(String prefix) {
         this.prefix = prefix;
         return this;
     }
 
-    public CommandBuilderD4J setSubCommandNames(List<String> subCommandNames) {
-        this.subCommandNames = subCommandNames;
+    public CommandBuilderD4J permissions(EnumSet<Permissions> permissions) {
+        this.permissions = permissions;
         return this;
     }
 
-    public CommandBuilderD4J setSubCommandNames(String... strings) {
-        if (strings.length > 0) {
-            this.subCommandNames = Arrays.asList(strings);
-        }
+    public CommandBuilderD4J requireMention(boolean requireMention) {
+        this.requireMention = requireMention;
         return this;
     }
 
-    public CommandBuilderD4J setIsMainCommand(boolean isMainCommand) {
-        this.isMainCommand = isMainCommand;
+    public CommandBuilderD4J allowPrivateMessage(boolean allowPrivateMessage) {
+        this.allowPrivateMessage = allowPrivateMessage;
         return this;
     }
 
-    public CommandBuilderD4J setEssential(boolean isEssential) {
-        this.essential = isEssential;
-        return this;
-    }
-
-    public Command build(Object object, Method method) {
-        return new CommandD4J() {
-            @Override
-            public boolean essential() {
-                return essential;
-            }
+    public CommandD4J build(CommandExecutorD4J executor) {
+        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage) {
 
             @Override
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public String getDesc() {
-                return description;
-            }
-
-            @Override
-            public List<String> getAlias() {
-                return aliases;
-            }
-
-            @Override
-            public List<String> getSubCommandNames() {
-                return subCommandNames;
-            }
-
-            @Override
-            public boolean isMainCommand() {
-                return isMainCommand;
-            }
-
-            @Override
-            public String getPrefix() {
-                return prefix;
-            }
-
-            @Override
-            public void execute(List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
-                method.invoke(object, args, event);
+            public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
+                return executor.execute(args, event, msgBuilder);
             }
         };
     }
 
-    public Command build(CommandExecutorD4J executor) {
-        return new CommandD4J() {
-            @Override
-            public boolean essential() {
-                return essential;
-            }
+    public CommandD4J build(Object obj, Method method) {
+        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage) {
 
             @Override
-            public String getName() {
-                return name;
-            }
-
-            @Override
-            public String getDesc() {
-                return description;
-            }
-
-            @Override
-            public List<String> getAlias() {
-                return aliases;
-            }
-
-            @Override
-            public List<String> getSubCommandNames() {
-                return subCommandNames;
-            }
-
-            @Override
-            public boolean isMainCommand() {
-                return isMainCommand;
-            }
-
-            @Override
-            public String getPrefix() {
-                return prefix;
-            }
-
-            @Override
-            public void execute(List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
-                executor.execute(args, event);
+            public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
+                return Optional.ofNullable(method.invoke(obj, args, event, msgBuilder));
             }
         };
     }

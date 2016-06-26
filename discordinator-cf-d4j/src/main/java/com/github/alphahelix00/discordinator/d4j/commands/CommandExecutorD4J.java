@@ -1,9 +1,11 @@
 package com.github.alphahelix00.discordinator.d4j.commands;
 
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.util.MessageBuilder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created on:   6/17/2016
@@ -12,5 +14,5 @@ import java.util.List;
 @FunctionalInterface
 public interface CommandExecutorD4J {
 
-    void execute(List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException;
+    Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException;
 }
