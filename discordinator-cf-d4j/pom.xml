@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.github.alphahelix00</groupId>
             <artifactId>Ordinator</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 
