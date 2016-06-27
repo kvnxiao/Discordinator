@@ -8,4 +8,5 @@ public class PermissionDefaults {
 
     public static final boolean REQUIRE_MENTION = false;
     public static final boolean ALLOW_DM = false;
+    public static final boolean REMOVE_CALL_MESSAGE = false;
 }

@@ -11,7 +11,10 @@ import com.github.alphahelix00.ordinator.commands.SubCommand;
 import com.github.alphahelix00.ordinator.commands.handler.AbstractCommandHandler;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.Permissions;
+import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MessageBuilder;
+import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,6 +38,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
         boolean permValid = true;
         boolean requireMention = false;
         boolean hasMention = false;
+        boolean removeCallMessage = false;
         for (Object obj : extraArgs) {
             if (obj instanceof MessageReceivedEvent) {
                 event = (MessageReceivedEvent) obj;
@@ -43,17 +47,28 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
             }
         }
         if (event != null) {
+            final MessageReceivedEvent messageReceivedEvent = event;
             if (command instanceof CommandD4J) {
-                permValid = checkPermission(((CommandD4J) command).getPermissions(), event);
+                permValid = checkPermission(((CommandD4J) command).getPermissions(), messageReceivedEvent);
                 requireMention = ((CommandD4J) command).isRequireMention();
+                removeCallMessage = ((CommandD4J) command).isRemoveCallMessage();
             }
             if (permValid && hasMention == requireMention) {
-                LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName()
-                        + "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\"");
-                ((CommandExecutorD4J) command).execute(args, event, new MessageBuilder(event.getClient()));
+                LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + messageReceivedEvent.getMessage().getAuthor().getName()
+                        + "\" in channel \"" + messageReceivedEvent.getMessage().getChannel().getName() + "\" on server \"" + messageReceivedEvent.getMessage().getGuild().getName() + "\"");
+                if (removeCallMessage) {
+                    RequestBuffer.request(() -> {
+                       try {
+                           messageReceivedEvent.getMessage().delete();
+                       } catch (DiscordException | MissingPermissionsException e) {
+                           LOGGER.warn("Exception when attempting to to remove call message!");
+                       }
+                    });
+                }
+                ((CommandExecutorD4J) command).execute(args, messageReceivedEvent, new MessageBuilder(messageReceivedEvent.getClient()));
             } else {
-                LOGGER.info(event.getMessage().getAuthor().getName() + " cannot execute command: " + command.getPrefix() + command.getName() + " right now (check permissions & mentions!)"
-                        + "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\"");
+                LOGGER.info(messageReceivedEvent.getMessage().getAuthor().getName() + " cannot execute command: " + command.getPrefix() + command.getName() + " right now (check permissions & mentions!)"
+                        + "\" in channel \"" + messageReceivedEvent.getMessage().getChannel().getName() + "\" on server \"" + messageReceivedEvent.getMessage().getGuild().getName() + "\"");
             }
         }
     }
@@ -61,63 +76,47 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
 
     @Override
     protected Command createMainCommand(MainCommand annotation, Object obj, Method method, boolean isMainCommand) {
-        return CommandBuilderD4J.builder(
+        CommandBuilderD4J commandBuilder = CommandBuilderD4J.builder(
                 annotation.name(), annotation.description())
                 .prefix(annotation.prefix())
                 .alias(annotation.alias())
                 .enabled(true)
                 .essential(annotation.essential())
                 .subCommandNames(annotation.subCommands())
-                .isMain(true)
-                .permissions(getPermissions(method))
-                .requireMention(requireMention(method))
-                .allowPrivateMessage(allowPrivateMessage(method))
-                .build(obj, method);
+                .isMain(true);
+        return setPermissions(commandBuilder, method).build(obj, method);
     }
 
     @Override
     protected Command createSubCommand(SubCommand annotation, Object obj, Method method, boolean isMainCommand) {
-        return CommandBuilderD4J.builder(
+        CommandBuilderD4J commandBuilder = CommandBuilderD4J.builder(
                 annotation.name(), annotation.description())
                 .prefix(annotation.prefix())
                 .alias(annotation.alias())
                 .enabled(true)
                 .essential(annotation.essential())
                 .subCommandNames(annotation.subCommands())
-                .isMain(false)
-                .permissions(getPermissions(method))
-                .requireMention(requireMention(method))
-                .allowPrivateMessage(allowPrivateMessage(method))
-                .build(obj, method);
+                .isMain(false);
+        return setPermissions(commandBuilder, method).build(obj, method);
     }
 
     private boolean checkPermission(EnumSet<Permissions> requiredPerms, MessageReceivedEvent event) {
         return (event.getMessage().getChannel().getModifiedPermissions(event.getMessage().getAuthor()).containsAll(requiredPerms));
     }
 
-    private EnumSet<Permissions> getPermissions(Method method) {
-        EnumSet<Permissions> permissionsEnumSet = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
+
+    private CommandBuilderD4J setPermissions(CommandBuilderD4J commandBuilderD4J, Method method) {
         if (method.isAnnotationPresent(Permission.class)) {
+            EnumSet<Permissions> permissionsEnumSet = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
             final Permission permissionAnn = method.getAnnotation(Permission.class);
+
             permissionsEnumSet.addAll(Arrays.asList(permissionAnn.permissions()));
+            return commandBuilderD4J.permissions(permissionsEnumSet)
+                    .allowPrivateMessage(permissionAnn.allowPrivateMessage())
+                    .removeCallMessage(permissionAnn.removeCallMessage())
+                    .requireMention(permissionAnn.requireMention());
         }
-        return permissionsEnumSet;
-    }
-
-    private boolean requireMention(Method method) {
-        if (method.isAnnotationPresent(Permission.class)) {
-            final Permission permissionAnn = method.getAnnotation(Permission.class);
-            return permissionAnn.requireMention();
-        }
-        return false;
-    }
-
-    private boolean allowPrivateMessage(Method method) {
-        if (method.isAnnotationPresent(Permission.class)) {
-            final Permission permissionAnn = method.getAnnotation(Permission.class);
-            return permissionAnn.allowPrivateMessage();
-        }
-        return false;
+        return commandBuilderD4J;
     }
 
 }

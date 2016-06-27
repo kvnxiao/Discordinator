@@ -29,6 +29,7 @@ public class CommandBuilderD4J {
     private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
     private boolean requireMention = false;
     private boolean allowPrivateMessage = false;
+    private boolean removeCallMessage = false;
 
     public static CommandBuilderD4J builder(final String name, final String description) {
         return new CommandBuilderD4J(name, description);
@@ -98,8 +99,13 @@ public class CommandBuilderD4J {
         return this;
     }
 
+    public CommandBuilderD4J removeCallMessage(boolean removeCallMessage) {
+        this.removeCallMessage = removeCallMessage;
+        return this;
+    }
+
     public CommandD4J build(CommandExecutorD4J executor) {
-        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage) {
+        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, removeCallMessage) {
 
             @Override
             public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
@@ -109,7 +115,7 @@ public class CommandBuilderD4J {
     }
 
     public CommandD4J build(Object obj, Method method) {
-        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage) {
+        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, removeCallMessage) {
 
             @Override
             public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {

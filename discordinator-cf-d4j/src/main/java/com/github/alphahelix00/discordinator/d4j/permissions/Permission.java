@@ -21,4 +21,6 @@ public @interface Permission {
 
     boolean allowPrivateMessage() default PermissionDefaults.ALLOW_DM;
 
+    boolean removeCallMessage() default PermissionDefaults.REMOVE_CALL_MESSAGE;
+
 }

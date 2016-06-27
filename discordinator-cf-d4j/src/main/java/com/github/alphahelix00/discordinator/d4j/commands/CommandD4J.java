@@ -15,13 +15,15 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J{
     private EnumSet<Permissions> permissions;
     private boolean requireMention;
     private boolean allowPrivateMessage;
+    private boolean removeCallMessage;
 
     public CommandD4J(String prefix, String name, String description, List<String> aliases, boolean isMain, boolean isEnabled, boolean isEssential, Map<String, Command> subCommandMap, Map<String, String> subCommandNames,
-                      EnumSet<Permissions> permissions, boolean requireMention, boolean allowPrivateMessage) {
+                      EnumSet<Permissions> permissions, boolean requireMention, boolean allowPrivateMessage, boolean removeCallMessage) {
         super(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames);
         this.permissions = permissions;
         this.requireMention = requireMention;
         this.allowPrivateMessage = allowPrivateMessage;
+        this.removeCallMessage = removeCallMessage;
     }
 
     @Override
@@ -39,6 +41,10 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J{
 
     public boolean isAllowPrivateMessage() {
         return allowPrivateMessage;
+    }
+
+    public boolean isRemoveCallMessage() {
+        return removeCallMessage;
     }
 
 }
