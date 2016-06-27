@@ -3,44 +3,14 @@
 [![Build Status](https://drone.io/github.com/alphahelix00/Discordinator/status.png)](https://drone.io/github.com/alphahelix00/Discordinator/latest)
 [![](https://jitpack.io/v/alphahelix00/Discordinator.svg?style=flat-square)](https://jitpack.io/#alphahelix00/Discordinator)
 
-An easily adoptable command framework primarily intended for Discord bots.
+A modular command framework for Discord bots.
 
 ## About
 
-**define:** _**Discordinator**_ = *[Discord](https://discordapp.com/)* + *Ordinator* (one who ordains or decrees)
+**define:** _**Discordinator**_ = *[Discord](https://discordapp.com/)* + *[Ordinator](https://github.com/alphahelix00/Ordinator)* (one who ordains or decrees)
 
-Discordinator is a modularized command framework, created with the purpose of handling the processing and execution of user defined commands.
-Although originally intended for use in conjunction with other Discord API wrappers (e.g. [Discord4J](https://github.com/austinv11/Discord4J)), the core of the framework can also be easily adapted for use in any other project.
-
-##Functionality
-The command framework within Discordinator is roughly based on the Command Design Pattern by abstracting executable commands from the client.
-The main two classes within the framework are:
-- `CommandRegistry` *(the command bank)*
-  - Storage of all commands
-- `CommandHandler` *(the ordinator)*
-  - Validate and parse Strings for command calls
-  - Calls upon the registry to register and execute commands (annotated methods / CommandBuilder / Command class extension)
-
-### Commands
-Commands are split into _**main**_ and _**sub**_ commands. Main commands must have unique names and are registered into the command registry. Sub commands are entirely optional, and are tied to their parent commands by their unique names. All commands are called by their _**alias**_ but defined by their _**name**_ For a sub command to properly function, it is crucial that the name of the sub commands is set within the parent command. Take the following as an example:
-
-#### Example
-Supposed you have defined a main command `(name = "Greet Command", alias = "greet", subCommands = {"Hi Command", "Bye Command"})` that will print out `Greetings.`.
-
-And suppose you have also defined two sub commands: `(name = "Hi Command", alias = "hi")` that will print out `Hi.`, and `(name = "Bye Command", alias = "bye")` that will print out `Bye.`
-
-When a string containing `greet` is parsed, `Greetings.` will be printed. When a string containing `greet hi` is parsed, `Greetings. Hi.` will be printed, and likewise if `greet bye` is parsed, `Greetings. Bye.` will be printed.
-
-All commands can have a list of arguments passed into it on execution. For example, if `greet bye args1 args2` is called, the main command will execute a method to print `Greetings. Bye`, but will also have access to an argument token list, `{args1, args2}`.
-Depending on the supplied argument, conditional statements can be made to 
-Note that one can choose to have a main command do nothing and have only its sub commands do something. So in the above example, we can choose to not print out `"Greetings."`, so that only `"Hi."` is displayed when `greet hi` is parsed.
-
-#### Command chaining
-There is no limit to the number of sub commands, provided that all the names are unique. It is also possible for a sub command to be the sub command of another sub command. As long as the defining hierarchy is followed, there should be no problem having any number of sub command depth.
-
-##### Repeatable (Self-chaining) Commands
-A command can also be defined as self-chaining or repeatable if the command name is included within the subCommands: `(name = "repeat", alias = "repeat", subCommands = "repeat")`
-Calling `repeat` will do something once, and calling `repeat repeat` will do the same thing twice, as if it were a sub command of itself.
+Discordinator is a modularized command framework, created with the purpose of handling the processing and execution of user defined commands for Discord bots.
+**Please see [Ordinator](https://github.com/alphahelix00/Ordinator) for more information regarding what's included and how to use.**
 
 ## Creating / Registering / Parsing Commands
 
@@ -51,9 +21,10 @@ There are several ways of defining a command (the below examples are illustrated
 
 ##### Annotations
 A class containing methods defined with `@MainCommand` (and for sub commands, `@SubCommand`) can have those methods registered as a command in the CommandRegistry.
+Permissions are defined with `@Permission` and are optional: without it, the command defaults to requiring a user to be able to read and send messages in the channel.
 Call `#registerAnnotatedCommands` on the class object from the `AbstractCommandHandler` implementation (e.g. use `CommandHandlerD4J.registerAnnotatedCommands(_objWithAnnotatedMethods_)` if you are using the Discord4J module)
 
-By default, the prefix is not a required field within the annotation (defaults to `!`), and the method name can be declared as anything.
+By default, the prefix is not a required field within the annotation (defaults to `-`, as defined in *Ordinator* project), and the method name can be declared as anything.
 
 ```java
 public class Commands {
@@ -76,6 +47,9 @@ public class Commands {
             desc = "first subcommand of main command",
             subCommands = {"sub2"}
     )
+    @Permission(
+        requireMention = true
+    )
     public void subCommand(List<String> args, MessageReceivedEvent event) {
         // DO SUB COMMAND STUFF
     }
@@ -85,6 +59,9 @@ public class Commands {
             prefix = "?",
             alias = {"sub", "three"},
             desc = "second subcommand of main command"
+    )
+    @Permission(
+        permissions = {Permissions.ADMINISTRATOR}
     )
     public void tertiaryCommand(List<String> args, MessageReceivedEvent event) {
         // DO SUB SUB COMMAND STUFF
@@ -98,9 +75,13 @@ public class Commands {
 public class Commands {
 
     @MainCommand(
-            name = "ping",
+            name = "Ping Command",
             alias = "ping",
             desc = "bot says pong!"
+    )
+    @Permission(
+        permissions = {Permissions.SEND_MESSAGES, Permissions.READ_MESSAGES}
+        requireMention = false
     )
     public void ping(List<String> args, MessageReceivedEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
         MessageBuilder builder = new MessageBuilder(event.getClient());
@@ -125,71 +106,55 @@ CommandHandlerD4J#registerAnnotatedCommands(new Commands());
 ---
 
 ##### CommandBuilder
-Using the CommandBuilder, supply the proper information to create a new command and add it to the registry.
-Within the .build() method call, the use of Java 8 lambda expressions is recommended  as it takes in a functional interface CommandExecutor object
+Using `CommandBuilderD4J`, supply the command properties to be created and added to the registry.
+Within the .build() method call, the use of Java 8 lambda expressions is recommended as it takes in a functional interface `CommandExecutorD4J` object.
 
 ```java
-commandHandler.registerCommand(new CommandBuilderD4J("ping", "bot says pong!", "ping")
-        .setPrefix("?").setIsMainCommand(true).build((args, event) -> {
-                    // Here we define what happens when the command is called!
-                    MessageBuilder builder = new MessageBuilder(event.getClient());
-                    RequestBuffer.request(() -> {
-                        try {
-                            builder.withChannel(event.getMessage().getChannel()).withContent("pong!").build();
-                        } catch (DiscordException | MissingPermissionsException e) {
-                            LOGGER.warn("Attempt to call ping command by user " + event.getMessage().getAuthor().getName()
-                                    + " in channel " + event.getMessage().getChannel().getName() + " on server " + event.getMessage().getGuild().getName() + " failed.", e);
-                        }
-                    });
-                }));
+CommandHandlerD4J#registerCommand(CommandBuilderD4J.builder("Ping Command", "bot says pong!")
+                   .alias("ping")
+                   .prefix("?")
+                   .isMain(true)
+                   .build((args, event, msgBuilder) -> {
+                       // Here we define what happens when the command is called!
+                       RequestBuffer.request(() -> {
+                           try {
+                               msgBuilder.withChannel(event.getMessage().getChannel()).withContent("pong!").build();
+                           } catch (DiscordException | MissingPermissionsException e) {
+                               LOGGER.warn("Attempt to call ping command by user " + event.getMessage().getAuthor().getName()
+                                       + " in channel " + event.getMessage().getChannel().getName() + " on server " + event.getMessage().getGuild().getName() + " failed.", e);
+                           }
+                       });
+                       return Optional.empty();     // Essentially a void method
+                   });
 ```
 
 ---
 
 ##### User-defined commands extending Command class
-One can also define commands by extending the (library specific) `Command` class. For example, if using the Discord4J module, create a class that extends `CommandD4J`:
-
+One can also define commands by extending the (library specific) `Command` class. For example, if using the Discord4J module, create a class that extends `CommandD4J` and define the command's properties and create a constructor:
 ```java
-public class PingCommand extends CommandD4J {
+public class Ping extends CommandD4J {
 
-    private final String PREFIX = "!";
-    private final String DESCRIPTION = "bot says pong!";
-    private final String NAME = "ping";
-    private final String[] ALIASES = {"ping"};
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public String getDesc() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    public List<String> getAlias() {
-        return Arrays.asList(ALIASES);
-    }
-
-    @Override
-    public List<String> getSubCommandNames() {
-        return null;
-    }
-
-    @Override
-    public boolean isMainCommand() {
-        return true;
-    }
-
-    @Override
-    public String getPrefix() {
-        return PREFIX;
+    public Ping() {
+        super(
+                "ping",                                                             // prefix
+                "Ping Command",                                                     // name
+                "bot says pong!",                                                   // description
+                Collections.singletonList("ping"),                                  // alias
+                true,                                                               // is main command?
+                true,                                                               // is enabled by default?
+                false,                                                              // is an essential command?
+                new HashMap<>(),                                                    // set to new HashMap<>() if no subcommands
+                new HashMap<>(),                                                    // set to new HashMap<>() if no subcommands
+                EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES),   // Permissions
+                false,                                                              // requires a mention?
+                false                                                               // bot sends reply as a private message / DM ?
+        );
     }
 
     // This method is called when the command is executed
     @Override
-    public void execute(List<String> list, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
+    public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
         // Here we define what happens when the command is called!
         MessageBuilder builder = new MessageBuilder(event.getClient());
         RequestBuffer.request(() -> {
@@ -200,8 +165,8 @@ public class PingCommand extends CommandD4J {
                         + " in channel " + event.getMessage().getChannel().getName() + " on server " + event.getMessage().getGuild().getName() + " failed.", e);
             }
         });
+        return Optional.empty();
     }
-
 }
 ```
 
@@ -211,11 +176,28 @@ CommandHandlerD4J#registerCommand(new PingCommand());
 ```
 
 ## Usage - Discord4J
-To import into your own project, download the jar files from [release](https://github.com/alphahelix00/Discordinator.java/releases) and add as external dependencies within your IDE, or see below for Maven import using jitpack.io. 
+To import into your own project, download the jar files from [release](https://github.com/alphahelix00/Discordinator/releases) and add as external dependencies within your IDE, or see below for import through jitpack.io.
+ 
+To use as a module in your [Discord4J bot](https://github.com/alphahelix00/AlphaBot), download the jar-with-dependencies .jar file from the release section or package the latest dev-SNAPSHOT commit yourself and place into the modules folder of your bot.
 
-##### In the future, a module .jar file will be provided that can be loaded into a Discord4J bot by simply placing it in the modules directory of the bot
+### Gradle
 
-For now, to enable the module, call `ModuleLoader.addModuleClass(DiscordinatorModule.class);` within your bot class or main class, _before_ the bot logs into Discord.
+###### build.gradle
+
+```
+allprojects {
+    repositories {
+        ...
+        maven { url "https://jitpack.io" }
+    }
+}
+```
+
+```
+dependencies {
+        compile 'com.github.alphahelix00.Discordinator:discordinator-cf:0.9.0'
+}
+```
 
 ### Maven
 
