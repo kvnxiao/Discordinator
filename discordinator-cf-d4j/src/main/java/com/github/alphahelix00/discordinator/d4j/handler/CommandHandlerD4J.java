@@ -10,11 +10,9 @@ import com.github.alphahelix00.ordinator.commands.MainCommand;
 import com.github.alphahelix00.ordinator.commands.SubCommand;
 import com.github.alphahelix00.ordinator.commands.handler.AbstractCommandHandler;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.MessageBuilder;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RequestBuffer;
+import sx.blah.discord.util.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,6 +49,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
         boolean requireMention = false;
         boolean hasMention = false;
         boolean removeCallMessage = false;
+        boolean privateMessage = false;
         for (Object obj : extraArgs) {
             if (obj instanceof MessageReceivedEvent) {
                 event = (MessageReceivedEvent) obj;
@@ -64,6 +63,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 permValid = checkPermission(((CommandD4J) command).getPermissions(), messageReceivedEvent);
                 requireMention = ((CommandD4J) command).isRequireMention();
                 removeCallMessage = ((CommandD4J) command).isRemoveCallMessage();
+                privateMessage = ((CommandD4J) command).isAllowPrivateMessage();
             }
             if (permValid && hasMention == requireMention) {
                 LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + messageReceivedEvent.getMessage().getAuthor().getName()
@@ -77,7 +77,20 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                         }
                     });
                 }
-                ((CommandExecutorD4J) command).execute(args, messageReceivedEvent, new MessageBuilder(messageReceivedEvent.getClient()));
+                if (!privateMessage) {
+                    ((CommandExecutorD4J) command).execute(args, messageReceivedEvent, new MessageBuilder(messageReceivedEvent.getClient()).withChannel(event.getMessage().getChannel()));
+                } else {
+                    RequestBuffer.request(() -> {
+                        try {
+                            ((CommandExecutorD4J) command).execute(args, messageReceivedEvent, new MessageBuilder(messageReceivedEvent.getClient())
+                                    .withChannel(messageReceivedEvent.getClient().getOrCreatePMChannel(messageReceivedEvent.getMessage().getAuthor())));
+                        } catch (DiscordException | RateLimitException e) {
+                            LOGGER.warn("Discord error in attempting to communicate in a private channel!");
+                        } catch (Exception e) {
+                            LOGGER.warn("Error in attempting to communicate in a private channel!");
+                        }
+                    });
+                }
             } else {
                 LOGGER.info(messageReceivedEvent.getMessage().getAuthor().getName() + " cannot execute command: " + command.getPrefix() + command.getName() + " right now (check permissions & mentions!)"
                         + "\" in channel \"" + messageReceivedEvent.getMessage().getChannel().getName() + "\" on server \"" + messageReceivedEvent.getMessage().getGuild().getName() + "\"");
