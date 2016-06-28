@@ -5,6 +5,8 @@ import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
 /**
+ * MessageReceivedEvent listener which attempts to validate and parse messages received by the bot
+ * <p>
  * <p>Created on:   6/17/2016</p>
  * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */

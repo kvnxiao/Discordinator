@@ -10,6 +10,8 @@ import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.modules.IModule;
 
 /**
+ * The main module class that is loaded by Discord4J's module loader.
+ * <p>
  * <p>Created on:   6/17/2016</p>
  * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
