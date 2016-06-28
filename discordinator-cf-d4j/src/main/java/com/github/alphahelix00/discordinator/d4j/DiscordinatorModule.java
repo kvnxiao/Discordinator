@@ -10,8 +10,8 @@ import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.modules.IModule;
 
 /**
- * Created on:   6/17/2016
- * Author:       Kevin Xiao (github.com/alphahelix00)
+ * <p>Created on:   6/17/2016</p>
+ * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
 public class DiscordinatorModule implements IModule {
 

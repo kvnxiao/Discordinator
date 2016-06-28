@@ -23,8 +23,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * Created on:   6/17/2016
- * Author:       Kevin Xiao (github.com/alphahelix00)
+ * <p>Created on:   6/17/2016</p>
+ * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
 public class CommandHandlerD4J extends AbstractCommandHandler {
 
@@ -73,9 +73,8 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
         }
     }
 
-
     @Override
-    protected Command createMainCommand(MainCommand annotation, Object obj, Method method, boolean isMainCommand) {
+    protected Command createMainCommand(MainCommand annotation, Object obj, Method method) {
         CommandBuilderD4J commandBuilder = CommandBuilderD4J.builder(
                 annotation.name(), annotation.description())
                 .prefix(annotation.prefix())
@@ -88,7 +87,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
     }
 
     @Override
-    protected Command createSubCommand(SubCommand annotation, Object obj, Method method, boolean isMainCommand) {
+    protected Command createSubCommand(SubCommand annotation, Object obj, Method method) {
         CommandBuilderD4J commandBuilder = CommandBuilderD4J.builder(
                 annotation.name(), annotation.description())
                 .prefix(annotation.prefix())
@@ -104,7 +103,6 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
         return (event.getMessage().getChannel().getModifiedPermissions(event.getMessage().getAuthor()).containsAll(requiredPerms));
     }
 
-
     private CommandBuilderD4J setPermissions(CommandBuilderD4J commandBuilderD4J, Method method) {
         if (method.isAnnotationPresent(Permission.class)) {
             EnumSet<Permissions> permissionsEnumSet = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
@@ -117,6 +115,16 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                     .requireMention(permissionAnn.requireMention());
         }
         return commandBuilderD4J;
+    }
+
+    public static void logExceptionFail(MessageReceivedEvent event, String commandName, Exception e) {
+        LOGGER.warn("Attempt to call " + commandName + " by user " + event.getMessage().getAuthor().getName()
+                + " in channel " + event.getMessage().getChannel().getName() + " on server " + event.getMessage().getGuild().getName() + " failed!", e);
+    }
+
+    public static void logMissingPerms(MessageReceivedEvent event, String commandName, Exception e) {
+        LOGGER.warn("INSUFFICIENT PRIVILEGES: Attempt to call " + commandName + " by user " + event.getMessage().getAuthor().getName()
+                + " in channel " + event.getMessage().getChannel().getName() + " on server " + event.getMessage().getGuild().getName() + " failed!", e);
     }
 
 }

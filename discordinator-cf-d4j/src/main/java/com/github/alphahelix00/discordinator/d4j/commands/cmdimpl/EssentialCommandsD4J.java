@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Author:      Kevin Xiao
- * Created on:  6/21/2016
+ * <p>Created on:   6/21/2016</p>
+ * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
 public class EssentialCommandsD4J extends EssentialCommands {
 

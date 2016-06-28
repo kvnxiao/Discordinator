@@ -1,8 +1,8 @@
 package com.github.alphahelix00.discordinator.d4j.permissions;
 
 /**
- * Created on:   6/25/2016
- * Author:       Kevin Xiao (github.com/alphahelix00)
+ * <p>Created on:   6/25/2016</p>
+ * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
 public class PermissionDefaults {
 
