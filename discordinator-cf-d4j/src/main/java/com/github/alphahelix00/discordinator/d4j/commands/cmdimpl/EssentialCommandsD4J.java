@@ -11,18 +11,27 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Author:      Kevin Xiao
- * Created on:  6/21/2016
+ * The Discord4J implementation of essential commands: enable, disable, and help commands
+ * <p>
+ * <p>Created on:   6/21/2016</p>
+ * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
 public class EssentialCommandsD4J extends EssentialCommands {
 
+    /**
+     * Enable command which helps enable any disabled commands so that they may be called again
+     */
     public static class EnableD4J extends EssentialCommands.Enable implements CommandExecutorD4J {
+
         @Override
         public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
             return super.execute(args);
         }
     }
 
+    /**
+     * Disable command which disables any non-essential commands and prevents them from being called
+     */
     public static class DisableD4J extends EssentialCommands.Disable implements CommandExecutorD4J {
         @Override
         public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
@@ -30,6 +39,9 @@ public class EssentialCommandsD4J extends EssentialCommands {
         }
     }
 
+    /**
+     * Help command which will print a formatted list of all main commands, or print more information regarding a specific command
+     */
     public static class HelpD4J extends EssentialCommands.Help implements CommandExecutorD4J {
         @Override
         public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {

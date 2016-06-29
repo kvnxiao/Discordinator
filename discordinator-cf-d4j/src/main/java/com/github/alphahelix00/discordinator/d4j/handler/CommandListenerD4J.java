@@ -5,8 +5,10 @@ import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 
 /**
- * Created on:   6/17/2016
- * Author:       Kevin Xiao (github.com/alphahelix00)
+ * MessageReceivedEvent listener which attempts to validate and parse messages received by the bot
+ * <p>
+ * <p>Created on:   6/17/2016</p>
+ * <p>Author:       Kevin Xiao (github.com/alphahelix00)</p>
  */
 public class CommandListenerD4J implements IListener<MessageReceivedEvent> {
 
@@ -36,7 +38,7 @@ public class CommandListenerD4J implements IListener<MessageReceivedEvent> {
             message = message.substring(botMention[1].length() + 1);
             hasMention = true;
         }
-        commandHandler.validateParse(message, event, hasMention);
+        commandHandler.validateAndParse(message, event, hasMention);
     }
 
 }
