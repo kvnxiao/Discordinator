@@ -3,13 +3,11 @@
 [![Build Status](https://drone.io/github.com/alphahelix00/Discordinator/status.png)](https://drone.io/github.com/alphahelix00/Discordinator/latest)
 [![](https://jitpack.io/v/alphahelix00/Discordinator.svg?style=flat-square)](https://jitpack.io/#alphahelix00/Discordinator)
 
-A modular command framework for Discord bots.
-
 ## About
 
 **define:** _**Discordinator**_ = *[Discord](https://discordapp.com/)* + *[Ordinator](https://github.com/alphahelix00/Ordinator)* (one who ordains or decrees)
 
-Discordinator is a modularized command framework, created with the purpose of handling the processing and execution of user defined commands for Discord bots.
+Discordinator is a fast, modularized command framework created with the purpose of handling the processing and execution of user defined commands for Discord bots.
 
 #### Functionality
 The command framework within Discordinator is an extension to *Ordinator*, which is roughly based on the Command Design Pattern by abstracting executable commands from the client.
