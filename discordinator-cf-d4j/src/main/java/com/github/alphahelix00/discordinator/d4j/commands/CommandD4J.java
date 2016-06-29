@@ -22,6 +22,7 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J {
     private EnumSet<Permissions> permissions;
     private boolean requireMention;
     private boolean allowPrivateMessage;
+    private boolean forcePrivateReply;
     private boolean removeCallMessage;
 
     /**
@@ -38,15 +39,17 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J {
      * @param subCommandNames     set to an empty new HashMap if the command will have no sub commands
      * @param permissions         EnumSet of Permissions denoting required user permissions in order to execute command
      * @param requireMention      boolean -> requires a bot mention to be called?
-     * @param allowPrivateMessage boolean -> bot reply is sent as a private message (true) or as a channel message (false)?
+     * @param forcePrivateReply   boolean -> bot reply is sent as a private message (true) or as a channel message (false)?
+     * @param allowPrivateMessage boolean -> command can be called through a private message?
      * @param removeCallMessage   boolean -> remove call message upon command execution?
      */
     public CommandD4J(String prefix, String name, String description, List<String> aliases, boolean isMain, boolean isEnabled, boolean isEssential, Map<String, Command> subCommandMap, Map<String, String> subCommandNames,
-                      EnumSet<Permissions> permissions, boolean requireMention, boolean allowPrivateMessage, boolean removeCallMessage) {
+                      EnumSet<Permissions> permissions, boolean requireMention, boolean allowPrivateMessage, boolean forcePrivateReply, boolean removeCallMessage) {
         super(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames);
         this.permissions = permissions;
         this.requireMention = requireMention;
         this.allowPrivateMessage = allowPrivateMessage;
+        this.forcePrivateReply = forcePrivateReply;
         this.removeCallMessage = removeCallMessage;
     }
 
@@ -82,12 +85,21 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J {
     }
 
     /**
+     * Returns whether or not this command can be called through a private message
+     *
+     * @return boolean denoting whether or not the message can be called privately
+     */
+    public boolean isAllowPrivateMessage() {
+        return allowPrivateMessage;
+    }
+
+    /**
      * Returns whether or not this command will have the bot reply in a private message
      *
      * @return boolean denoting whether or not the message will be sent privately or publicly
      */
-    public boolean isAllowPrivateMessage() {
-        return allowPrivateMessage;
+    public boolean isForcePrivateReply() {
+        return forcePrivateReply;
     }
 
     /**

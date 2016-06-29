@@ -33,11 +33,18 @@ public @interface Permission {
     Permissions[] permissions() default {Permissions.SEND_MESSAGES, Permissions.READ_MESSAGES};
 
     /**
-     * Gets whether or not the command will trigger the bot to send a private message in response
+     * Gets whether or not the user can call this command through a private message to the bot
      *
-     * @return private message boolean value, default to false
+     * @return allowed to call command through private message boolean value, default to false
      */
     boolean allowPrivateMessage() default PermissionDefaults.ALLOW_DM;
+
+    /**
+     * Gets whether or not the command will trigger the bot to send a private message in response
+     *
+     * @return private message reply boolean value, default to false
+     */
+    boolean forcePrivateReply() default PermissionDefaults.ALLOW_DM;
 
     /**
      * Gets whether or not the command call message will be removed upon execution

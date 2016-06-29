@@ -31,6 +31,7 @@ public class CommandBuilderD4J {
     private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
     private boolean requireMention = false;
     private boolean allowPrivateMessage = false;
+    private boolean forcePrivateReply = false;
     private boolean removeCallMessage = false;
 
     /**
@@ -156,14 +157,26 @@ public class CommandBuilderD4J {
     }
 
     /**
-     * Sets whether or not the bot's reply will be a private message (true), or will be in the public channel where
-     * the command call was received (false)
+     * Sets whether or not the command can be called through a private message to the bot (true), or if it can only be called
+     * through a public channel (false)
      *
-     * @param allowPrivateMessage boolean denoting whether or not a bot reply to the command will be a private message
+     * @param allowPrivateMessage boolean denoting whether or not the command can be issued through a private message
      * @return current CommandBuilderD4J instance
      */
     public CommandBuilderD4J allowPrivateMessage(boolean allowPrivateMessage) {
         this.allowPrivateMessage = allowPrivateMessage;
+        return this;
+    }
+
+    /**
+     * Sets whether or not the bot's reply will be a private message (true), or will be in the public channel where
+     * the command call was received (false)
+     *
+     * @param forcePrivateReply boolean denoting whether or not a bot reply to the command will be a private message
+     * @return current CommandBuilderD4J instance
+     */
+    public CommandBuilderD4J forcePrivateReply(boolean forcePrivateReply) {
+        this.forcePrivateReply = forcePrivateReply;
         return this;
     }
 
@@ -186,7 +199,7 @@ public class CommandBuilderD4J {
      * @see CommandExecutorD4J
      */
     public CommandD4J build(CommandExecutorD4J executor) {
-        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, removeCallMessage) {
+        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, forcePrivateReply, removeCallMessage) {
 
             @Override
             public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
@@ -203,7 +216,7 @@ public class CommandBuilderD4J {
      * @return complete CommandD4J that has been built
      */
     public CommandD4J build(Object obj, Method method) {
-        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, removeCallMessage) {
+        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, forcePrivateReply, removeCallMessage) {
 
             @Override
             public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {

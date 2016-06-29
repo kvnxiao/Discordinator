@@ -10,7 +10,6 @@ import com.github.alphahelix00.ordinator.commands.MainCommand;
 import com.github.alphahelix00.ordinator.commands.SubCommand;
 import com.github.alphahelix00.ordinator.commands.handler.AbstractCommandHandler;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
-import sx.blah.discord.handle.obj.IPrivateChannel;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.*;
 
@@ -45,11 +44,8 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
     @Override
     protected void executeCommand(Command command, List<String> args, Object... extraArgs) throws IllegalAccessException, InvocationTargetException {
         MessageReceivedEvent event = null;
-        boolean permValid = true;
-        boolean requireMention = false;
         boolean hasMention = false;
-        boolean removeCallMessage = false;
-        boolean privateMessage = false;
+
         for (Object obj : extraArgs) {
             if (obj instanceof MessageReceivedEvent) {
                 event = (MessageReceivedEvent) obj;
@@ -57,44 +53,93 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 hasMention = (boolean) obj;
             }
         }
+
         if (event != null) {
-            final MessageReceivedEvent messageReceivedEvent = event;
             if (command instanceof CommandD4J) {
-                permValid = checkPermission(((CommandD4J) command).getPermissions(), messageReceivedEvent);
-                requireMention = ((CommandD4J) command).isRequireMention();
-                removeCallMessage = ((CommandD4J) command).isRemoveCallMessage();
-                privateMessage = ((CommandD4J) command).isAllowPrivateMessage();
+                parseCommandD4J((CommandD4J) command, args, event, hasMention);
+            } else {
+                parseCommandRegular(command, args, event, hasMention);
             }
-            if (permValid && hasMention == requireMention) {
-                LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + messageReceivedEvent.getMessage().getAuthor().getName()
-                        + "\" in channel \"" + messageReceivedEvent.getMessage().getChannel().getName() + "\" on server \"" + messageReceivedEvent.getMessage().getGuild().getName() + "\"");
-                if (removeCallMessage) {
-                    RequestBuffer.request(() -> {
-                        try {
-                            messageReceivedEvent.getMessage().delete();
-                        } catch (DiscordException | MissingPermissionsException e) {
-                            LOGGER.warn("Exception when attempting to to remove call message!");
-                        }
-                    });
-                }
-                if (!privateMessage) {
-                    ((CommandExecutorD4J) command).execute(args, messageReceivedEvent, new MessageBuilder(messageReceivedEvent.getClient()).withChannel(event.getMessage().getChannel()));
+        } else {
+            LOGGER.error("MessageReceivedEvent is null! This shouldn't have happened...");
+        }
+    }
+
+    private void parseCommandD4J(CommandD4J command, List<String> args, MessageReceivedEvent event, boolean hasMention) throws IllegalAccessException, InvocationTargetException {
+        boolean validCall = checkPermission(command.getPermissions(), event) && (command.isRequireMention() == hasMention);
+        if (validCall) {
+            if (!event.getMessage().getChannel().isPrivate()) {
+                // Command received on a public channel
+                checkRemoveCallMessage(command.isRemoveCallMessage(), event);
+                // Checks if command has force private reply on, and then have the bot reply accordingly
+                if (!command.isForcePrivateReply()) {
+                    // Attempt to execute command on public channels
+                    executePublicly(command, args, event);
                 } else {
-                    RequestBuffer.request(() -> {
-                        try {
-                            ((CommandExecutorD4J) command).execute(args, messageReceivedEvent, new MessageBuilder(messageReceivedEvent.getClient())
-                                    .withChannel(messageReceivedEvent.getClient().getOrCreatePMChannel(messageReceivedEvent.getMessage().getAuthor())));
-                        } catch (DiscordException | RateLimitException e) {
-                            LOGGER.warn("Discord error in attempting to communicate in a private channel!");
-                        } catch (Exception e) {
-                            LOGGER.warn("Error in attempting to communicate in a private channel!");
-                        }
-                    });
+                    // Attempt to execute command on private channels if force private boolean is true
+                    executePrivately(command, args, event);
                 }
             } else {
-                LOGGER.info(messageReceivedEvent.getMessage().getAuthor().getName() + " cannot execute command: " + command.getPrefix() + command.getName() + " right now (check permissions & mentions!)"
-                        + "\" in channel \"" + messageReceivedEvent.getMessage().getChannel().getName() + "\" on server \"" + messageReceivedEvent.getMessage().getGuild().getName() + "\"");
+                // Command received from private message
+                // Attempt to execute command on private channels only if allow private message boolean is true
+                if (command.isAllowPrivateMessage()) {
+                    executePrivately(command, args, event);
+                }
             }
+        } else {
+            LOGGER.info(event.getMessage().getAuthor().getName() + " cannot execute command: " + command.getPrefix() + command.getName() + " right now (check permissions and/or mentions!)");
+        }
+    }
+
+    /**
+     * For calling commands that do not extend CommandD4J, but implement CommandExecutorD4J. These commands don't have permissions set,
+     * and will be treated as essentially public-allowed and private-allowed commands, with no mentions.
+     *
+     * @param command
+     * @param args
+     * @param event
+     * @param hasMention
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private void parseCommandRegular(Command command, List<String> args, MessageReceivedEvent event, boolean hasMention) throws IllegalAccessException, InvocationTargetException {
+        if (!hasMention) {
+            if (!event.getMessage().getChannel().isPrivate()) {
+                executePublicly(command, args, event);
+            } else {
+                executePrivately(command, args, event);
+            }
+        }
+    }
+
+    private void executePublicly(Command command, List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
+        logCommandCall(event, command, false);
+        ((CommandExecutorD4J) command).execute(args, event, new MessageBuilder(event.getClient()).withChannel(event.getMessage().getChannel()));
+    }
+
+    private void executePrivately(Command command, List<String> args, MessageReceivedEvent event) throws IllegalAccessException, InvocationTargetException {
+        logCommandCall(event, command, true);
+        RequestBuffer.request(() -> {
+            try {
+                ((CommandExecutorD4J) command).execute(args, event, new MessageBuilder(event.getClient())
+                        .withChannel(event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor())));
+            } catch (DiscordException | RateLimitException e) {
+                LOGGER.warn("Discord error in attempting to communicate in a private channel!");
+            } catch (Exception e) {
+                LOGGER.warn("Error in attempting to communicate in a private channel!");
+            }
+        });
+    }
+
+    private void checkRemoveCallMessage(boolean removeCallMessage, MessageReceivedEvent event) {
+        if (removeCallMessage) {
+            RequestBuffer.request(() -> {
+                try {
+                    event.getMessage().delete();
+                } catch (DiscordException | MissingPermissionsException e) {
+                    LOGGER.warn("Exception when attempting to to remove call message!");
+                }
+            });
         }
     }
 
@@ -171,10 +216,10 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
         if (method.isAnnotationPresent(Permission.class)) {
             EnumSet<Permissions> permissionsEnumSet = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
             final Permission permissionAnn = method.getAnnotation(Permission.class);
-
             permissionsEnumSet.addAll(Arrays.asList(permissionAnn.permissions()));
             return commandBuilderD4J.permissions(permissionsEnumSet)
                     .allowPrivateMessage(permissionAnn.allowPrivateMessage())
+                    .forcePrivateReply(permissionAnn.forcePrivateReply())
                     .removeCallMessage(permissionAnn.removeCallMessage())
                     .requireMention(permissionAnn.requireMention());
         }
@@ -203,6 +248,11 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
     public static void logMissingPerms(MessageReceivedEvent event, String commandName, Exception e) {
         LOGGER.warn("BOT HAS INSUFFICIENT PRIVILEGES: Attempt to call " + commandName + " by user " + event.getMessage().getAuthor().getName()
                 + " in channel " + event.getMessage().getChannel().getName() + " on server " + event.getMessage().getGuild().getName() + " failed!", e);
+    }
+
+    public static void logCommandCall(MessageReceivedEvent event, Command command, boolean isPrivateChannel) {
+        LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName() +
+                (isPrivateChannel ? "in private chat" : "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\""));
     }
 
 }
