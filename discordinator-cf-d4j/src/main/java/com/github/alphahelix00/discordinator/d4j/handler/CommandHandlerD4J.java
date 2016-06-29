@@ -84,6 +84,8 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 // Attempt to execute command on private channels only if allow private message boolean is true
                 if (command.isAllowPrivateMessage()) {
                     executePrivately(command, args, event);
+                } else {
+                    LOGGER.info(event.getMessage().getAuthor().getName() + " cannot execute command: " + command.getPrefix() + command.getName() + " as it is not allowed in private messages!");
                 }
             }
         } else {
@@ -191,6 +193,9 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
      * @return whether or not the user has permissions to call this command
      */
     private boolean checkPermission(EnumSet<Permissions> requiredPerms, MessageReceivedEvent event) {
+        if (event.getMessage().getChannel().isPrivate()) {
+            return true;
+        }
         return checkPermission(requiredPerms, (event.getMessage().getChannel().getModifiedPermissions(event.getMessage().getAuthor())));
     }
 
