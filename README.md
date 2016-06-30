@@ -135,7 +135,7 @@ public class Commands {
             desc = "main command",
             subCommands = {"sub1"}
     )
-    public void mainCommand(List<String> args, MessageReceivedEvent event) {
+    public void mainCommand(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) {
         // DO MAIN COMMAND STUFF
     }
 
@@ -149,7 +149,7 @@ public class Commands {
     @Permission(
         requireMention = true
     )
-    public void subCommand(List<String> args, MessageReceivedEvent event) {
+    public void subCommand(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) {
         // DO SUB COMMAND STUFF
     }
 
@@ -162,7 +162,7 @@ public class Commands {
     @Permission(
         permissions = {Permissions.ADMINISTRATOR}
     )
-    public void tertiaryCommand(List<String> args, MessageReceivedEvent event) {
+    public void tertiaryCommand(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) {
         // DO SUB SUB COMMAND STUFF
     }
 
