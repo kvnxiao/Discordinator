@@ -125,7 +125,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
             try {
                 ((CommandExecutorD4J) command).execute(args, event, new MessageBuilder(event.getClient())
                         .withChannel(event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor())));
-            } catch (DiscordException | RateLimitException e) {
+            } catch (DiscordException e) {
                 LOGGER.warn("Discord error in attempting to communicate in a private channel!");
             } catch (Exception e) {
                 LOGGER.warn("Error in attempting to communicate in a private channel!");
