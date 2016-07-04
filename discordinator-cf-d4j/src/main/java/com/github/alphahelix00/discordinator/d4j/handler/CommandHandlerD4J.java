@@ -257,7 +257,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
 
     public static void logCommandCall(MessageReceivedEvent event, Command command, boolean isPrivateChannel) {
         LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName() +
-                (isPrivateChannel ? "in private chat" : "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\""));
+                (isPrivateChannel ? "\" in private chat" : "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\""));
     }
 
 }
