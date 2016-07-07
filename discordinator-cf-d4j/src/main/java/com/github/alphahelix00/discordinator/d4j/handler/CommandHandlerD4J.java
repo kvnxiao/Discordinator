@@ -161,6 +161,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 .alias(annotation.alias())
                 .enabled(true)
                 .essential(annotation.essential())
+                .usage(annotation.usage())
                 .subCommandNames(annotation.subCommands())
                 .isMain(true);
         return setPermissions(commandBuilder, method).build(obj, method);
@@ -180,6 +181,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 .alias(annotation.alias())
                 .enabled(true)
                 .essential(annotation.essential())
+                .usage(annotation.usage())
                 .subCommandNames(annotation.subCommands())
                 .isMain(false);
         return setPermissions(commandBuilder, method).build(obj, method);
