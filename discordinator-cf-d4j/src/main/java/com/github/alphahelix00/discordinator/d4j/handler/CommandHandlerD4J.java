@@ -125,7 +125,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
             try {
                 ((CommandExecutorD4J) command).execute(args, event, new MessageBuilder(event.getClient())
                         .withChannel(event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor())));
-            } catch (DiscordException | RateLimitException e) {
+            } catch (DiscordException e) {
                 LOGGER.warn("Discord error in attempting to communicate in a private channel!");
             } catch (Exception e) {
                 LOGGER.warn("Error in attempting to communicate in a private channel!");
@@ -161,6 +161,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 .alias(annotation.alias())
                 .enabled(true)
                 .essential(annotation.essential())
+                .usage(annotation.usage())
                 .subCommandNames(annotation.subCommands())
                 .isMain(true);
         return setPermissions(commandBuilder, method).build(obj, method);
@@ -180,6 +181,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
                 .alias(annotation.alias())
                 .enabled(true)
                 .essential(annotation.essential())
+                .usage(annotation.usage())
                 .subCommandNames(annotation.subCommands())
                 .isMain(false);
         return setPermissions(commandBuilder, method).build(obj, method);
@@ -257,7 +259,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
 
     public static void logCommandCall(MessageReceivedEvent event, Command command, boolean isPrivateChannel) {
         LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName() +
-                (isPrivateChannel ? "in private chat" : "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\""));
+                (isPrivateChannel ? "\" in private chat" : "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\""));
     }
 
 }

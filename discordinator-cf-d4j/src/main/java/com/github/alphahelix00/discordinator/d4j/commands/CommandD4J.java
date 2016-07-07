@@ -43,9 +43,9 @@ public abstract class CommandD4J extends Command implements CommandExecutorD4J {
      * @param allowPrivateMessage boolean -> command can be called through a private message?
      * @param removeCallMessage   boolean -> remove call message upon command execution?
      */
-    public CommandD4J(String prefix, String name, String description, List<String> aliases, boolean isMain, boolean isEnabled, boolean isEssential, Map<String, Command> subCommandMap, Map<String, String> subCommandNames,
+    public CommandD4J(String prefix, String name, String description, String usage, List<String> aliases, boolean isMain, boolean isEnabled, boolean isEssential, Map<String, Command> subCommandMap, Map<String, String> subCommandNames,
                       EnumSet<Permissions> permissions, boolean requireMention, boolean allowPrivateMessage, boolean forcePrivateReply, boolean removeCallMessage) {
-        super(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames);
+        super(prefix, name, description, usage, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames);
         this.permissions = permissions;
         this.requireMention = requireMention;
         this.allowPrivateMessage = allowPrivateMessage;

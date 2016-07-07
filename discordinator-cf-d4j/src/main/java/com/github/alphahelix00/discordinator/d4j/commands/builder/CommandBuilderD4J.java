@@ -24,6 +24,7 @@ public class CommandBuilderD4J {
     private boolean isEssential = CommandDefaults.ESSENTIAL;
     private boolean isEnabled = CommandDefaults.ENABLED;
     private String prefix = "!";
+    private String usage = CommandDefaults.USAGE;
     private final String name, description;
     private List<String> aliases;
     private Map<String, Command> subCommandMap = new HashMap<>();
@@ -148,11 +149,24 @@ public class CommandBuilderD4J {
     }
 
     /**
-     * @param requireMention
+     * Sets whether or not the command requires a mention to be called
+     *
+     * @param requireMention boolean denoting command requires mention
      * @return current CommandBuilderD4J instance
      */
     public CommandBuilderD4J requireMention(boolean requireMention) {
         this.requireMention = requireMention;
+        return this;
+    }
+
+    /**
+     * Sets the usage field information for the command
+     *
+     * @param usage usage field String
+     * @return current CommandBuilderD4J instance
+     */
+    public CommandBuilderD4J usage(String usage) {
+        this.usage = usage;
         return this;
     }
 
@@ -199,7 +213,7 @@ public class CommandBuilderD4J {
      * @see CommandExecutorD4J
      */
     public CommandD4J build(CommandExecutorD4J executor) {
-        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, forcePrivateReply, removeCallMessage) {
+        return new CommandD4J(prefix, name, description, usage, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, forcePrivateReply, removeCallMessage) {
 
             @Override
             public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
@@ -216,7 +230,7 @@ public class CommandBuilderD4J {
      * @return complete CommandD4J that has been built
      */
     public CommandD4J build(Object obj, Method method) {
-        return new CommandD4J(prefix, name, description, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, forcePrivateReply, removeCallMessage) {
+        return new CommandD4J(prefix, name, description, usage, aliases, isMain, isEnabled, isEssential, subCommandMap, subCommandNames, permissions, requireMention, allowPrivateMessage, forcePrivateReply, removeCallMessage) {
 
             @Override
             public Optional execute(List<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder) throws IllegalAccessException, InvocationTargetException {
