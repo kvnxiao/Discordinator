@@ -54,7 +54,7 @@ public class DiscordinatorModule implements IModule {
 
     @Override
     public String getMinimumDiscord4JVersion() {
-        return "2.5.0-SNAPSHOT";
+        return "2.5.0";
     }
 
     private void handleMessages(IDiscordClient client) {
