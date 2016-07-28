@@ -11,7 +11,10 @@ import com.github.alphahelix00.ordinator.commands.SubCommand;
 import com.github.alphahelix00.ordinator.commands.handler.AbstractCommandHandler;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.Permissions;
-import sx.blah.discord.util.*;
+import sx.blah.discord.util.DiscordException;
+import sx.blah.discord.util.MessageBuilder;
+import sx.blah.discord.util.MissingPermissionsException;
+import sx.blah.discord.util.RequestBuffer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -194,7 +197,7 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
      * @param event         MessageReceivedEvent (contains author's message -> get author's maximal permission set)
      * @return whether or not the user has permissions to call this command
      */
-    private boolean checkPermission(EnumSet<Permissions> requiredPerms, MessageReceivedEvent event) {
+    public static boolean checkPermission(EnumSet<Permissions> requiredPerms, MessageReceivedEvent event) {
         if (event.getMessage().getChannel().isPrivate()) {
             return true;
         }
@@ -260,6 +263,18 @@ public class CommandHandlerD4J extends AbstractCommandHandler {
     public static void logCommandCall(MessageReceivedEvent event, Command command, boolean isPrivateChannel) {
         LOGGER.info("Executing command: \"" + command.getPrefix() + command.getName() + "\", called by \"" + event.getMessage().getAuthor().getName() +
                 (isPrivateChannel ? "\" in private chat" : "\" in channel \"" + event.getMessage().getChannel().getName() + "\" on server \"" + event.getMessage().getGuild().getName() + "\""));
+    }
+
+    public static void replyUserMissingPerms(MessageReceivedEvent event, MessageBuilder msgBuilder, String commandName) {
+        RequestBuffer.request(() -> {
+            try {
+                msgBuilder.withContent("You do not have the permission to issue this command!").build();
+            } catch (MissingPermissionsException e) {
+                logMissingPerms(event, commandName, e);
+            } catch (DiscordException e) {
+                logExceptionFail(event, commandName, e);
+            }
+        });
     }
 
 }
