@@ -87,7 +87,7 @@ dependencies {
 </dependency>
 ```
 
-Replace `@VERSION_NUM@` with the version you want to use. Latest version = `1.2.0`, To use the latest development snapshot, use `dev-SNAPSHOT`.
+Replace `@VERSION_NUM@` with the version you want to use. To use the latest development snapshot, use `dev-SNAPSHOT`.
 
 ## Creating / Registering / Parsing Commands
 
