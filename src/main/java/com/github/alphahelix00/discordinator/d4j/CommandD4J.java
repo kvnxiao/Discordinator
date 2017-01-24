@@ -17,7 +17,7 @@ import java.util.LinkedList;
  */
 public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T> {
 
-    private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);;
+    private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
     private boolean isAllowDm = PermissionDefaults.ALLOW_DM;
     private boolean isRemoveCallMsg = PermissionDefaults.REMOVE_CALL_MESSAGE;
     private boolean isForcePrivateReply = PermissionDefaults.FORCE_PRIVATE_REPLY;
