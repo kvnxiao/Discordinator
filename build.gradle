@@ -19,7 +19,7 @@ repositories {
 dependencies {
     compile 'com.github.austinv11:Discord4j:2.7.0'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.8'
-    compile 'com.github.alphahelix00:ordinator:05d9c55'
+    compile 'com.github.alphahelix00:ordinator:1deda5a'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 

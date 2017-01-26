@@ -20,7 +20,7 @@ public @interface PermissionLevel {
      *
      * @return required mention boolean value, default to false
      */
-    boolean requireMention() default PermissionDefaults.REQUIRE_MENTION;
+    boolean reqMention() default PermissionDefaults.REQUIRE_MENTION;
 
     /**
      * Gets the array of Permissions required for this command
@@ -34,21 +34,21 @@ public @interface PermissionLevel {
      *
      * @return allowed to call command through private message boolean value, default to false
      */
-    boolean allowPrivateMessage() default PermissionDefaults.ALLOW_DM;
+    boolean allowPrivate() default PermissionDefaults.ALLOW_DM;
 
     /**
      * Gets whether or not the command will trigger the bot to send a private message in response
      *
      * @return private message reply boolean value, default to false
      */
-    boolean forcePrivateReply() default PermissionDefaults.ALLOW_DM;
+    boolean forcePrivate() default PermissionDefaults.FORCE_PRIVATE_REPLY;
 
     /**
      * Gets whether or not the command call message will be removed upon execution
      *
      * @return remove call message boolean value, default to false
      */
-    boolean removeCallMessage() default PermissionDefaults.REMOVE_CALL_MESSAGE;
+    boolean removeCall() default PermissionDefaults.REMOVE_CALL_MESSAGE;
 
 }
 

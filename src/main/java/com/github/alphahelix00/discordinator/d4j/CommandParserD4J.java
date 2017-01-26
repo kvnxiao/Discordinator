@@ -29,19 +29,19 @@ public class CommandParserD4J extends CommandParser {
             PermissionLevel permission = method.getAnnotation(PermissionLevel.class);
             permissionSet.addAll(Arrays.asList(permission.permissions()));
 
-            return new CommandD4J(annotation.prefix(), annotation.uniqueName(), annotation.description(), annotation.usage(), permissionSet, permission.allowPrivateMessage(), permission.removeCallMessage(), permission.forcePrivateReply(), permission.requireMention(), annotation.aliases()) {
+            return new CommandD4J(annotation.prefix(), annotation.uniqueName(), annotation.description(), annotation.usage(), permissionSet, permission.allowPrivate(), permission.removeCall(), permission.forcePrivate(), permission.reqMention(), annotation.aliases()) {
+                @Override
+                public Object execute(LinkedList args, MessageReceivedEvent event, MessageBuilder msgBuilder, Object... optionals) throws InvocationTargetException, IllegalAccessException {
+                    return method.invoke(instance, args, event, msgBuilder, optionals);
+                }
+            };
+        } else {
+            return new CommandD4J(annotation.prefix(), annotation.uniqueName(), annotation.description(), annotation.usage(), permissionSet, PermissionDefaults.ALLOW_DM, PermissionDefaults.REMOVE_CALL_MESSAGE, PermissionDefaults.FORCE_PRIVATE_REPLY, PermissionDefaults.REQUIRE_MENTION, annotation.aliases()) {
                 @Override
                 public Object execute(LinkedList args, MessageReceivedEvent event, MessageBuilder msgBuilder, Object... optionals) throws InvocationTargetException, IllegalAccessException {
                     return method.invoke(instance, args, event, msgBuilder, optionals);
                 }
             };
         }
-
-        return new CommandD4J(annotation.prefix(), annotation.uniqueName(), annotation.description(), annotation.usage(), permissionSet, PermissionDefaults.ALLOW_DM, PermissionDefaults.REMOVE_CALL_MESSAGE, PermissionDefaults.FORCE_PRIVATE_REPLY, PermissionDefaults.REQUIRE_MENTION, annotation.aliases()) {
-            @Override
-            public Object execute(LinkedList args, MessageReceivedEvent event, MessageBuilder msgBuilder, Object... optionals) throws InvocationTargetException, IllegalAccessException {
-                return method.invoke(instance, args, event, msgBuilder, optionals);
-            }
-        };
     }
 }
