@@ -10,4 +10,5 @@ public class PermissionDefaults {
     public static final boolean ALLOW_DM = false;
     public static final boolean REMOVE_CALL_MESSAGE = false;
     public static final boolean FORCE_PRIVATE_REPLY = false;
+
 }

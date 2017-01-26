@@ -1,15 +1,21 @@
 package com.github.alphahelix00.discordinator.d4j;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.alphahelix00.discordinator.d4j.perms.PermissionDefaults;
 import com.github.alphahelix00.ordinator.commands.Command;
-import com.github.alphahelix00.ordinator.commands.Defaults;
+import com.github.alphahelix00.ordinator.commands.CommandDefaults;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.MessageBuilder;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
 import java.util.LinkedList;
+
+import static com.github.alphahelix00.ordinator.commands.CommandDefaults.OBJECT_MAPPER;
 
 /**
  * Created on:   2017-01-22
@@ -17,10 +23,15 @@ import java.util.LinkedList;
  */
 public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T> {
 
+    @JsonProperty
     private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
+    @JsonProperty
     private boolean isAllowDm = PermissionDefaults.ALLOW_DM;
+    @JsonProperty
     private boolean isRemoveCallMsg = PermissionDefaults.REMOVE_CALL_MESSAGE;
+    @JsonProperty
     private boolean isForcePrivateReply = PermissionDefaults.FORCE_PRIVATE_REPLY;
+    @JsonProperty
     private boolean isRequireMention = PermissionDefaults.REQUIRE_MENTION;
 
     public CommandD4J(String prefix,
@@ -62,6 +73,47 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public void loadJsonSettings(JsonNode jsonRead) {
+        super.loadJsonSettings(jsonRead);
+
+        if (jsonRead.has("isAllowDm")) {
+            this.isAllowDm = jsonRead.get("isAllowDm").asBoolean();
+        } else {
+            LOGGER.debug("Missing \"isAllowDm\" field in {}.json", this.uniqueName);
+        }
+
+        if (jsonRead.has("isRemoveCallMsg")) {
+            this.isRemoveCallMsg = jsonRead.get("isRemoveCallMsg").asBoolean();
+        } else {
+            LOGGER.debug("Missing \"isRemoveCallMsg\" field in {}.json", this.uniqueName);
+        }
+
+        if (jsonRead.has("isForcePrivateReply")) {
+            this.isForcePrivateReply = jsonRead.get("isForcePrivateReply").asBoolean();
+        } else {
+            LOGGER.debug("Missing \"isForcePrivateReply\" field in {}.json", this.uniqueName);
+        }
+
+        if (jsonRead.has("isRequireMention")) {
+            this.isRequireMention = jsonRead.get("isRequireMention").asBoolean();
+        } else {
+            LOGGER.debug("Missing \"isRequireMention\" field in {}.json", this.uniqueName);
+        }
+
+        if (jsonRead.has("permissions")) {
+            try {
+                this.permissions = OBJECT_MAPPER.readValue(jsonRead.get("permissions").toString(), new TypeReference<EnumSet<Permissions>>() {
+                });
+            } catch (IOException e) {
+                LOGGER.debug("Could not process \"permissions\" field in {}.json", this.uniqueName);
+            }
+        } else {
+            LOGGER.debug("Missing \"permissions\" field in {}.json", this.uniqueName);
+        }
+    }
+
+    @Override
     public T execute(LinkedList<String> args, Object... optionals) throws InvocationTargetException, IllegalAccessException {
         return null;
     }
@@ -86,13 +138,33 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
         return isRequireMention;
     }
 
+    public void setPermissions(EnumSet<Permissions> permissions) {
+        this.permissions = permissions;
+    }
+
+    public void setAllowDm(boolean allowDm) {
+        isAllowDm = allowDm;
+    }
+
+    public void setRemoveCallMsg(boolean removeCallMsg) {
+        isRemoveCallMsg = removeCallMsg;
+    }
+
+    public void setForcePrivateReply(boolean forcePrivateReply) {
+        isForcePrivateReply = forcePrivateReply;
+    }
+
+    public void setRequireMention(boolean requireMention) {
+        isRequireMention = requireMention;
+    }
+
     public static class CommandBuilderD4J<T> {
 
         private String[] aliases;
         private String uniqueName;
-        private String description = Defaults.NO_DESCRIPTION;
-        private String usage = Defaults.NO_USAGE;
-        private String prefix = Defaults.PREFIX;
+        private String description = CommandDefaults.NO_DESCRIPTION;
+        private String usage = CommandDefaults.NO_USAGE;
+        private String prefix = CommandDefaults.PREFIX;
         private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
         private boolean isAllowDm = PermissionDefaults.ALLOW_DM;
         private boolean isRemoveCallMsg = PermissionDefaults.REMOVE_CALL_MESSAGE;

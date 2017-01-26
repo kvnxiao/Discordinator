@@ -22,14 +22,18 @@ import java.util.LinkedList;
  */
 public class Discordinator extends Ordinator implements IListener<MessageReceivedEvent> {
 
-    private Discordinator() {
-        this.commandBank = new CommandBank();
+    private Discordinator(boolean autoLoadConfig) {
+        this.commandBank = new CommandBank(autoLoadConfig);
         this.commandParser = new CommandParserD4J();
         this.commandExecutor = new CommandExecutorD4J();
     }
 
     public static Discordinator create() {
-        return new Discordinator();
+        return new Discordinator(false);
+    }
+
+    public static Discordinator create(boolean autoLoadConfig) {
+        return new Discordinator(autoLoadConfig);
     }
 
     @Override

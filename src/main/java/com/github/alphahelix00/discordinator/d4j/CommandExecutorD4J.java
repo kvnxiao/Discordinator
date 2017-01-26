@@ -17,7 +17,7 @@ public class CommandExecutorD4J extends CommandExecutor {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> T executeCommand(LinkedList<String> args, Command command, Object... optionals) throws InvocationTargetException, IllegalAccessException {
+    protected <T> T executeCommand(LinkedList<String> args, Command<?> command, Object... optionals) throws InvocationTargetException, IllegalAccessException {
         try {
             CommandD4J discordCommand = (CommandD4J) command;
             MessageReceivedEvent event = (MessageReceivedEvent) optionals[0];
@@ -28,4 +28,5 @@ public class CommandExecutorD4J extends CommandExecutor {
         }
         return null;
     }
+
 }
