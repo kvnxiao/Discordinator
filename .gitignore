@@ -62,5 +62,5 @@ crashlytics-build.properties
 fabric.properties
 
 .log
-modules/
-ordinator/
+/modules/
+/ordinator/
