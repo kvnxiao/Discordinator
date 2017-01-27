@@ -34,8 +34,8 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
 
     private final CommandLoaderD4J commandLoader;
 
-    private Discordinator(boolean autoLoadConfig) {
-        this.commandBank = new CommandBank(autoLoadConfig);
+    private Discordinator() {
+        this.commandBank = new CommandBank(this.config.isAutoLoadConfigs(), this.config.getCommandFolder());
         this.commandParser = new CommandParserD4J();
         this.commandExecutor = new CommandExecutorD4J();
         this.commandLoader = new CommandLoaderD4J();
@@ -44,11 +44,7 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
     }
 
     public static Discordinator create() {
-        return new Discordinator(false);
-    }
-
-    public static Discordinator create(boolean autoLoadConfig) {
-        return new Discordinator(autoLoadConfig);
+        return new Discordinator();
     }
 
     @Override
@@ -149,7 +145,7 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
     private void loadCommandsByAnnotations() {
         List<Class> annotatedClasses = commandLoader.getAnnotatedClasses();
         for (Class<?> annotatedClass : annotatedClasses) {
-            this.parseForAnnotatedCommands(annotatedClass);
+            this.addAnnotatedCommands(annotatedClass);
         }
     }
 
