@@ -64,3 +64,4 @@ fabric.properties
 .log
 /modules/
 /ordinator/
+ordinator.json
