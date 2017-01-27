@@ -10,7 +10,7 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
 
-def d4jClass = 'com.github.alphahelix00.discordinator.Discordinator'
+def d4jClass = 'com.github.alphahelix00.discordinator.d4j.DiscordinatorModule'
 
 repositories {
     mavenCentral()
