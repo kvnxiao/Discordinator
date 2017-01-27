@@ -77,7 +77,7 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
                         // Create channel for bot to reply to
                         IChannel channel = (command.isForcePrivateReply()) ? event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor()) : event.getMessage().getChannel();
 
-                        LOGGER.debug("Executing command... " + command.getUniqueName() + " with tokens: " + tokens.toString());
+//                        LOGGER.debug("Executing command... " + command.getUniqueName() + " with tokens: " + tokens.toString());
                         // Execute command
                         this.process(tokens, event, new MessageBuilder(event.getClient()).withChannel(channel));
 
