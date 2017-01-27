@@ -1,14 +1,16 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+}
+
 group 'com.github.alphahelix00'
 version '2.0-SNAPSHOT'
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '3.3'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
-}
-
 apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
+
+def d4jClass = 'com.github.alphahelix00.discordinator.Discordinator'
 
 repositories {
     mavenCentral()
@@ -17,13 +19,29 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.austinv11:Discord4j:2.7.0'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.8'
     compile 'com.github.alphahelix00:ordinator:a0ab273'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.6'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.6'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.6'
+    compileOnly 'com.github.austinv11:Discord4j:2.7.0'
+    compileOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.8'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 clean {
     delete "modules/"
     delete "ordinator/"
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.3'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
+
+jar {
+    manifest {
+        attributes('Implementation-Title': rootProject.name,
+                'Implementation-Version': version,
+                'Discord4J-ModuleClass': d4jClass)
+    }
 }
