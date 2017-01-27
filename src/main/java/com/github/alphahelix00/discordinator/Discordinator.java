@@ -2,9 +2,11 @@ package com.github.alphahelix00.discordinator;
 
 import com.github.alphahelix00.discordinator.d4j.CommandD4J;
 import com.github.alphahelix00.discordinator.d4j.CommandExecutorD4J;
+import com.github.alphahelix00.discordinator.d4j.CommandLoaderD4J;
 import com.github.alphahelix00.discordinator.d4j.CommandParserD4J;
 import com.github.alphahelix00.ordinator.Ordinator;
 import com.github.alphahelix00.ordinator.commands.CommandBank;
+import com.github.alphahelix00.ordinator.commands.CommandDefaults;
 import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
@@ -13,8 +15,16 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.*;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created on:   2017-01-22
@@ -22,10 +32,15 @@ import java.util.LinkedList;
  */
 public class Discordinator extends Ordinator implements IListener<MessageReceivedEvent> {
 
+    private final CommandLoaderD4J commandLoader;
+
     private Discordinator(boolean autoLoadConfig) {
         this.commandBank = new CommandBank(autoLoadConfig);
         this.commandParser = new CommandParserD4J();
         this.commandExecutor = new CommandExecutorD4J();
+        this.commandLoader = new CommandLoaderD4J();
+
+        this.loadExternalCommands();
     }
 
     public static Discordinator create() {
@@ -116,6 +131,60 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
 
     public static boolean checkPermission(EnumSet requiredPerms, EnumSet<Permissions> givenPerms) {
         return givenPerms.containsAll(requiredPerms);
+    }
+
+    public void loadExternalCommands() {
+        try {
+            List<Path> paths = Files.list(Paths.get(CommandDefaults.COMMAND_CONFIG_FOLDER))
+                    .filter(name -> name.toString().toLowerCase().endsWith(".jar"))
+                    .collect(Collectors.toList());
+            paths.forEach(path -> commandLoader.load(path.toFile()));
+        } catch (IOException e) {
+            LOGGER.error("Could not get list of files in attempt to load external commands");
+        }
+        loadCommandsByClass();
+        loadCommandsByAnnotations();
+    }
+
+    private void loadCommandsByAnnotations() {
+        List<Class> annotatedClasses = commandLoader.getAnnotatedClasses();
+        for (Class<?> annotatedClass : annotatedClasses) {
+            this.parseForAnnotatedCommands(annotatedClass);
+        }
+    }
+
+    private void loadCommandsByClass() {
+        List<Class> commandClasses = commandLoader.getCommandClasses();
+        for (Class<?> commandClass : commandClasses) {
+            CommandD4J command = null;
+            Constructor[] constructors = commandClass.getConstructors();
+            for (Constructor constructor : constructors) {
+                Class<?>[] paramTypes = constructor.getParameterTypes();
+
+                // Check if external command has a constructor that relies on Discordinator as a parameter
+                if (paramTypes.length == 1 && paramTypes[0].equals(Discordinator.class)) {
+                    try {
+                        Constructor<?> discordinatorConstructor = commandClass.getConstructor(Discordinator.class);
+                        command = (CommandD4J) discordinatorConstructor.newInstance(this);
+                    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        LOGGER.debug("External command class {} does not have a Discordinator reliant constructor.", commandClass.getSimpleName());
+                    }
+                } else {
+                    // Try to instantiate external command with empty constructor
+                    try {
+                        command = (CommandD4J) commandClass.newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        LOGGER.debug("External command class {} could not be instantiated with no-args constructor!", commandClass.getSimpleName());
+                    }
+                }
+
+                // Load external command into command bank
+                if (command != null) {
+                    LOGGER.debug("Loading external command '{}' ...", command.getUniqueName());
+                    this.addCommand(command);
+                }
+            }
+        }
     }
 
 }
