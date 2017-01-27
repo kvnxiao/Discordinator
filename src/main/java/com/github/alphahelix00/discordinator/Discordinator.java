@@ -6,7 +6,6 @@ import com.github.alphahelix00.discordinator.d4j.CommandLoaderD4J;
 import com.github.alphahelix00.discordinator.d4j.CommandParserD4J;
 import com.github.alphahelix00.ordinator.Ordinator;
 import com.github.alphahelix00.ordinator.commands.CommandBank;
-import com.github.alphahelix00.ordinator.commands.CommandDefaults;
 import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
@@ -131,7 +130,7 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
 
     public void loadExternalCommands() {
         try {
-            List<Path> paths = Files.list(Paths.get(CommandDefaults.COMMAND_CONFIG_FOLDER))
+            List<Path> paths = Files.list(Paths.get(this.config.getConfigFolder() + "/jars"))
                     .filter(name -> name.toString().toLowerCase().endsWith(".jar"))
                     .collect(Collectors.toList());
             paths.forEach(path -> commandLoader.load(path.toFile()));
