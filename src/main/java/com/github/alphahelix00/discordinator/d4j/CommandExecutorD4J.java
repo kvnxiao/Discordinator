@@ -2,7 +2,7 @@ package com.github.alphahelix00.discordinator.d4j;
 
 import com.github.alphahelix00.ordinator.commands.Command;
 import com.github.alphahelix00.ordinator.commands.CommandExecutor;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.MessageBuilder;
 
 import java.lang.reflect.InvocationTargetException;

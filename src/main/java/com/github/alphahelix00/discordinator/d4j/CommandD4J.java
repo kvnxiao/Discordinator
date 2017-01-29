@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.alphahelix00.discordinator.d4j.perms.PermissionDefaults;
 import com.github.alphahelix00.ordinator.commands.Command;
 import com.github.alphahelix00.ordinator.commands.CommandDefaults;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.MessageBuilder;
 

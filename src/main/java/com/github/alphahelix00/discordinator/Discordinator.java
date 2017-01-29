@@ -7,7 +7,7 @@ import com.github.alphahelix00.discordinator.d4j.CommandParserD4J;
 import com.github.alphahelix00.ordinator.Ordinator;
 import com.github.alphahelix00.ordinator.commands.CommandBank;
 import sx.blah.discord.api.events.IListener;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IMessage;

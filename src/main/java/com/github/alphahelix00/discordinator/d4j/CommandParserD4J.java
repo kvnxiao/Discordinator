@@ -5,7 +5,7 @@ import com.github.alphahelix00.discordinator.d4j.perms.PermissionLevel;
 import com.github.alphahelix00.ordinator.commands.Command;
 import com.github.alphahelix00.ordinator.commands.CommandAnn;
 import com.github.alphahelix00.ordinator.commands.CommandParser;
-import sx.blah.discord.handle.impl.events.MessageReceivedEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.Permissions;
 import sx.blah.discord.util.MessageBuilder;
 
