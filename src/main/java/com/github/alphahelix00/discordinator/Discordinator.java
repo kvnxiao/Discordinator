@@ -156,13 +156,13 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
             for (Constructor constructor : constructors) {
                 Class<?>[] paramTypes = constructor.getParameterTypes();
 
-                // Check if external command has a constructor that relies on Discordinator as a parameter
-                if (paramTypes.length == 1 && paramTypes[0].equals(Discordinator.class)) {
+                // Check if external command has a constructor that relies on the CommandBank as a parameter
+                if (paramTypes.length == 1 && paramTypes[0].equals(CommandBank.class)) {
                     try {
-                        Constructor<?> discordinatorConstructor = commandClass.getConstructor(Discordinator.class);
-                        command = (CommandD4J) discordinatorConstructor.newInstance(this);
+                        Constructor<?> bankConstructor = commandClass.getConstructor(CommandBank.class);
+                        command = (CommandD4J) bankConstructor.newInstance(this.commandBank);
                     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        LOGGER.debug("External command class {} does not have a Discordinator reliant constructor.", commandClass.getSimpleName());
+                        LOGGER.debug("External command class {} does not have a CommandBank reliant constructor.", commandClass.getSimpleName());
                     }
                 } else {
                     // Try to instantiate external command with empty constructor
