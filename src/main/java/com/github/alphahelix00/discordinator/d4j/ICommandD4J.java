@@ -1,10 +1,10 @@
 package com.github.alphahelix00.discordinator.d4j;
 
+import com.github.alphahelix00.ordinator.commands.CommandContext;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.MessageBuilder;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedList;
 
 /**
  * Created on:   2017-01-22
@@ -13,6 +13,6 @@ import java.util.LinkedList;
 @FunctionalInterface
 public interface ICommandD4J<T> {
 
-    T execute(LinkedList<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder, Object... optionals) throws InvocationTargetException, IllegalAccessException;
+    T execute(CommandContext context, MessageReceivedEvent event, MessageBuilder msgBuilder) throws InvocationTargetException, IllegalAccessException;
 
 }

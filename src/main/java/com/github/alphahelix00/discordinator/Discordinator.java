@@ -6,6 +6,7 @@ import com.github.alphahelix00.discordinator.d4j.CommandLoaderD4J;
 import com.github.alphahelix00.discordinator.d4j.CommandParserD4J;
 import com.github.alphahelix00.ordinator.Ordinator;
 import com.github.alphahelix00.ordinator.commands.CommandBank;
+import com.github.alphahelix00.ordinator.commands.CommandContext;
 import sx.blah.discord.api.events.IListener;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
@@ -21,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,15 +49,16 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
     @Override
     public void handle(MessageReceivedEvent event) {
         IMessage message = event.getMessage();
+        String messageContent = message.getContent();
 
-        LinkedList<String> tokens = this.tokenize(message.getContent());
-        boolean hasBotMention = hasBotMention(message, tokens.peek());
+        CommandContext context = CommandContext.of(messageContent);
+        boolean hasBotMention = hasBotMention(message, context.alias());
         if (hasBotMention) {
-            tokens.pop();
+            messageContent = context.args();
         }
 
-        if (tokens.size() > 0) {
-            CommandD4J command = (CommandD4J) this.getCommand(tokens);
+        if (context.isValid()) {
+            CommandD4J command = (CommandD4J) this.getCommand(context.alias());
             if (command != null) {
                 String user = event.getMessage().getAuthor().getName();
                 boolean isDm = event.getMessage().getChannel().isPrivate();
@@ -76,9 +77,8 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
                         // Create channel for bot to reply to
                         IChannel channel = (command.isForcePrivateReply()) ? event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor()) : event.getMessage().getChannel();
 
-//                        LOGGER.debug("Executing command... " + command.getUniqueName() + " with tokens: " + tokens.toString());
                         // Execute command
-                        this.process(tokens, event, new MessageBuilder(event.getClient()).withChannel(channel));
+                        this.process(messageContent, event, new MessageBuilder(event.getClient()).withChannel(channel));
 
                         // Remove call message if necessary
                         this.processMessage(command.isRemoveCallMsg(), isDm, event);

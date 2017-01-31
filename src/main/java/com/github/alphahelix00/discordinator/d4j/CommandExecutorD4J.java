@@ -1,13 +1,12 @@
 package com.github.alphahelix00.discordinator.d4j;
 
 import com.github.alphahelix00.ordinator.commands.Command;
+import com.github.alphahelix00.ordinator.commands.CommandContext;
 import com.github.alphahelix00.ordinator.commands.CommandExecutor;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.MessageBuilder;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 /**
  * Created on:   2017-01-22
@@ -17,12 +16,12 @@ public class CommandExecutorD4J extends CommandExecutor {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> T executeCommand(LinkedList<String> args, Command<?> command, Object... optionals) throws InvocationTargetException, IllegalAccessException {
+    protected <T> T executeCommand(CommandContext context, Command<?> command, Object... optionals) throws InvocationTargetException, IllegalAccessException {
         try {
             CommandD4J discordCommand = (CommandD4J) command;
             MessageReceivedEvent event = (MessageReceivedEvent) optionals[0];
             MessageBuilder msgBuilder = (MessageBuilder) optionals[1];
-            return (T) discordCommand.execute(args, event, msgBuilder, Arrays.copyOfRange(optionals, 2, optionals.length));
+            return (T) discordCommand.execute(context, event, msgBuilder);
         } catch (ClassCastException e) {
             e.printStackTrace();
         }

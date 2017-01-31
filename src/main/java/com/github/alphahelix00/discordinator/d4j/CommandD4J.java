@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.alphahelix00.discordinator.d4j.perms.PermissionDefaults;
 import com.github.alphahelix00.ordinator.commands.Command;
+import com.github.alphahelix00.ordinator.commands.CommandContext;
 import com.github.alphahelix00.ordinator.commands.CommandDefaults;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.Permissions;
@@ -13,7 +14,6 @@ import sx.blah.discord.util.MessageBuilder;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumSet;
-import java.util.LinkedList;
 
 import static com.github.alphahelix00.ordinator.commands.CommandDefaults.OBJECT_MAPPER;
 
@@ -114,7 +114,7 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
     }
 
     @Override
-    public T execute(LinkedList<String> args, Object... optionals) throws InvocationTargetException, IllegalAccessException {
+    public T execute(CommandContext context, Object... optionals) throws InvocationTargetException, IllegalAccessException {
         return null;
     }
 
@@ -231,8 +231,8 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
             return new CommandD4J<T>(this.prefix, this.uniqueName, this.description, this.usage, this.permissions, this.isAllowDm, this.isRemoveCallMsg, this.isForcePrivateReply, this.isRequireMention, this.aliases) {
 
                 @Override
-                public T execute(LinkedList<String> args, MessageReceivedEvent event, MessageBuilder msgBuilder, Object... optionals) throws InvocationTargetException, IllegalAccessException {
-                    return executor.execute(args, event, msgBuilder, optionals);
+                public T execute(CommandContext context, MessageReceivedEvent event, MessageBuilder msgBuilder) throws InvocationTargetException, IllegalAccessException {
+                    return executor.execute(context, event, msgBuilder);
                 }
             };
         }
