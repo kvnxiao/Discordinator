@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
         this.commandParser = new CommandParserD4J();
         this.commandExecutor = new CommandExecutorD4J();
         this.commandLoader = new CommandLoaderD4J();
-
+        this.executor = Executors.newCachedThreadPool();
         this.loadExternalCommands();
     }
 
@@ -47,50 +48,52 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
     }
 
     @Override
-    public void handle(MessageReceivedEvent event) {
-        IMessage message = event.getMessage();
-        String messageContent = message.getContent();
+    public void handle(final MessageReceivedEvent event) {
+        final IMessage message = event.getMessage();
 
-        CommandContext context = CommandContext.of(messageContent);
-        boolean hasBotMention = hasBotMention(message, context.alias());
-        if (hasBotMention) {
-            messageContent = context.args();
-        }
+        executor.submit(() -> {
+            String messageContent = message.getContent();
+            CommandContext context = CommandContext.of(messageContent);
+            boolean hasBotMention = hasBotMention(message, context.alias());
+            if (hasBotMention) {
+                messageContent = context.args();
+            }
 
-        if (context.isValid()) {
-            CommandD4J command = (CommandD4J) this.getCommand(context.alias());
-            if (command != null) {
-                String user = event.getMessage().getAuthor().getName();
-                boolean isDm = event.getMessage().getChannel().isPrivate();
+            if (context.isValid()) {
+                CommandD4J command = (CommandD4J) this.getCommand(context.alias());
+                if (command != null) {
+                    String user = event.getMessage().getAuthor().getName();
+                    boolean isDm = event.getMessage().getChannel().isPrivate();
 
-                // Log command execution for private (DM) and non-private channels
-                if (isDm) {
-                    LOGGER.debug("{} attempting to execute command: {}", user, command.getUniqueName());
-                } else {
-                    IGuild guild = event.getMessage().getGuild();
-                    LOGGER.debug("{} in guild \"{}\" attempting to execute command: {}", user, guild.getName(), command.getUniqueName());
-                }
-
-                // Execute command if user has permission to do so
-                if (hasPermission(command, event.getMessage(), isDm, hasBotMention)) {
-                    try {
-                        // Create channel for bot to reply to
-                        IChannel channel = (command.isForcePrivateReply()) ? event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor()) : event.getMessage().getChannel();
-
-                        // Execute command
-                        this.process(messageContent, event, new MessageBuilder(event.getClient()).withChannel(channel));
-
-                        // Remove call message if necessary
-                        this.processMessage(command.isRemoveCallMsg(), isDm, event);
-
-                    } catch (DiscordException | RateLimitException e) {
-                        LOGGER.error("Exception in attempting to select channel for bot to reply to!");
+                    // Log command execution for private (DM) and non-private channels
+                    if (isDm) {
+                        LOGGER.debug("{} attempting to execute command: {}", user, command.getUniqueName());
+                    } else {
+                        IGuild guild = event.getMessage().getGuild();
+                        LOGGER.debug("{} in guild \"{}\" attempting to execute command: {}", user, guild.getName(), command.getUniqueName());
                     }
-                } else {
-                    LOGGER.error(user + " has no permission to execute this command!");
+
+                    // Execute command if user has permission to do so
+                    if (hasPermission(command, event.getMessage(), isDm, hasBotMention)) {
+                        try {
+                            // Create channel for bot to reply to
+                            IChannel channel = (command.isForcePrivateReply()) ? event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor()) : event.getMessage().getChannel();
+
+                            // Execute command
+                            this.process(messageContent, event, new MessageBuilder(event.getClient()).withChannel(channel));
+
+                            // Remove call message if necessary
+                            this.processMessage(command.isRemoveCallMsg(), isDm, event);
+
+                        } catch (DiscordException | RateLimitException e) {
+                            LOGGER.error("Exception in attempting to select channel for bot to reply to!");
+                        }
+                    } else {
+                        LOGGER.error(user + " has no permission to execute this command!");
+                    }
                 }
             }
-        }
+        });
     }
 
     private boolean hasBotMention(IMessage message, String firstToken) {
