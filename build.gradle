@@ -23,7 +23,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.6'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.6'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.6'
-    compileOnly 'com.github.austinv11:Discord4j:554493e'
+    compileOnly 'com.github.austinv11:Discord4j:912f3a3'
     compileOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.9'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
