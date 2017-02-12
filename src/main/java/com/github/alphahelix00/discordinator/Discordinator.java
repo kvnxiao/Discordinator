@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static com.github.alphahelix00.discordinator.d4j.CommandUtils.sendBuffered;
+
 /**
  * Created on:   2017-01-22
  * Author:       Kevin Xiao (github.com/alphahelix00)
@@ -91,10 +93,9 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
                     } else {
                         IChannel privateChannel = event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor());
 
-                        MessageBuilder privateMessageBuilder = new MessageBuilder(event.getClient()).withChannel(privateChannel);
-                        privateMessageBuilder.appendContent("Sorry **" + event.getMessage().getAuthor().getName() + "**, you have no permission to execute **" + context.alias()
-                                + "** in **" + event.getGuild().getName() + "**");
-                        privateMessageBuilder.build();
+                        sendBuffered(new MessageBuilder(event.getClient()).withChannel(privateChannel)
+                                .appendContent("Sorry **" + event.getMessage().getAuthor().getName() + "**, you have no permission to execute **" + context.alias()
+                                        + "** in **" + event.getGuild().getName() + "**"), LOGGER);
                         LOGGER.error(user + " has no permission to execute command '{}'!", context.alias());
                     }
                 }
