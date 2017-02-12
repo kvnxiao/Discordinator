@@ -89,7 +89,13 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
                             LOGGER.error("Exception in attempting to select channel for bot to reply to!");
                         }
                     } else {
-                        LOGGER.error(user + " has no permission to execute this command!");
+                        IChannel privateChannel = event.getClient().getOrCreatePMChannel(event.getMessage().getAuthor());
+
+                        MessageBuilder privateMessageBuilder = new MessageBuilder(event.getClient()).withChannel(privateChannel);
+                        privateMessageBuilder.appendContent("Sorry **" + event.getMessage().getAuthor().getName() + "**, you have no permission to execute **" + context.alias()
+                                + "** in **" + event.getGuild().getName() + "**");
+                        privateMessageBuilder.build();
+                        LOGGER.error(user + " has no permission to execute command '{}'!", context.alias());
                     }
                 }
             }
