@@ -38,13 +38,14 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
                       String uniqueName,
                       String description,
                       String usage,
+                      boolean execWithSubcommands,
                       EnumSet<Permissions> permissions,
                       boolean isAllowDm,
                       boolean isRemoveCallMsg,
                       boolean isForcePrivateReply,
                       boolean isRequireMention,
                       final String... aliases) {
-        super(prefix, uniqueName, description, usage, aliases);
+        super(prefix, uniqueName, description, usage, execWithSubcommands, aliases);
         this.permissions = permissions;
         this.isAllowDm = isAllowDm;
         this.isRemoveCallMsg = isRemoveCallMsg;
@@ -73,38 +74,17 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void loadJsonSettings(JsonNode jsonRead) {
-        super.loadJsonSettings(jsonRead);
+    public void loadJsonSettings(JsonNode node) {
+        super.loadJsonSettings(node);
 
-        if (jsonRead.has("isAllowDm")) {
-            this.isAllowDm = jsonRead.get("isAllowDm").asBoolean();
-        } else {
-            LOGGER.debug("Missing \"isAllowDm\" field in {}.json", this.uniqueName);
-        }
+        this.isAllowDm = getJsonProperty(node, "isAllowDm", Boolean.class, this.isAllowDm);
+        this.isRemoveCallMsg = getJsonProperty(node, "isRemoveCallMsg", Boolean.class, this.isRemoveCallMsg);
+        this.isForcePrivateReply = getJsonProperty(node, "isForcePrivateReply", Boolean.class, this.isForcePrivateReply);
+        this.isRequireMention = getJsonProperty(node, "isRequireMention", Boolean.class, this.isRequireMention);
 
-        if (jsonRead.has("isRemoveCallMsg")) {
-            this.isRemoveCallMsg = jsonRead.get("isRemoveCallMsg").asBoolean();
-        } else {
-            LOGGER.debug("Missing \"isRemoveCallMsg\" field in {}.json", this.uniqueName);
-        }
-
-        if (jsonRead.has("isForcePrivateReply")) {
-            this.isForcePrivateReply = jsonRead.get("isForcePrivateReply").asBoolean();
-        } else {
-            LOGGER.debug("Missing \"isForcePrivateReply\" field in {}.json", this.uniqueName);
-        }
-
-        if (jsonRead.has("isRequireMention")) {
-            this.isRequireMention = jsonRead.get("isRequireMention").asBoolean();
-        } else {
-            LOGGER.debug("Missing \"isRequireMention\" field in {}.json", this.uniqueName);
-        }
-
-        if (jsonRead.has("permissions")) {
+        if (node.has("permissions")) {
             try {
-                this.permissions = OBJECT_MAPPER.readValue(jsonRead.get("permissions").toString(), new TypeReference<EnumSet<Permissions>>() {
-                });
+                this.permissions = OBJECT_MAPPER.readValue(node.get("permissions").toString(), new TypeReference<EnumSet<Permissions>>() {});
             } catch (IOException e) {
                 LOGGER.debug("Could not process \"permissions\" field in {}.json", this.uniqueName);
             }
@@ -166,6 +146,7 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
         private String usage = CommandDefaults.NO_USAGE;
         private String prefix = CommandDefaults.PREFIX;
         private EnumSet<Permissions> permissions = EnumSet.of(Permissions.READ_MESSAGES, Permissions.SEND_MESSAGES);
+        private boolean execWithSubcommands = CommandDefaults.EXEC_WITH_SUBCOMMANDS;
         private boolean isAllowDm = PermissionDefaults.ALLOW_DM;
         private boolean isRemoveCallMsg = PermissionDefaults.REMOVE_CALL_MESSAGE;
         private boolean isForcePrivateReply = PermissionDefaults.FORCE_PRIVATE_REPLY;
@@ -228,7 +209,7 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
         }
 
         public CommandD4J<T> build(ICommandD4J<T> executor) {
-            return new CommandD4J<T>(this.prefix, this.uniqueName, this.description, this.usage, this.permissions, this.isAllowDm, this.isRemoveCallMsg, this.isForcePrivateReply, this.isRequireMention, this.aliases) {
+            return new CommandD4J<T>(this.prefix, this.uniqueName, this.description, this.usage, this.execWithSubcommands, this.permissions, this.isAllowDm, this.isRemoveCallMsg, this.isForcePrivateReply, this.isRequireMention, this.aliases) {
 
                 @Override
                 public T execute(CommandContext context, MessageReceivedEvent event, MessageBuilder msgBuilder) throws InvocationTargetException, IllegalAccessException {
