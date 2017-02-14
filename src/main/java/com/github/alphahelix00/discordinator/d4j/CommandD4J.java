@@ -34,17 +34,7 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
     @JsonProperty
     private boolean isRequireMention = PermissionDefaults.REQUIRE_MENTION;
 
-    public CommandD4J(String prefix,
-                      String uniqueName,
-                      String description,
-                      String usage,
-                      boolean execWithSubcommands,
-                      EnumSet<Permissions> permissions,
-                      boolean isAllowDm,
-                      boolean isRemoveCallMsg,
-                      boolean isForcePrivateReply,
-                      boolean isRequireMention,
-                      final String... aliases) {
+    public CommandD4J(String prefix, String uniqueName, String description, String usage, boolean execWithSubcommands, EnumSet<Permissions> permissions, boolean isAllowDm, boolean isRemoveCallMsg, boolean isForcePrivateReply, boolean isRequireMention, final String... aliases) {
         super(prefix, uniqueName, description, usage, execWithSubcommands, aliases);
         this.permissions = permissions;
         this.isAllowDm = isAllowDm;
@@ -98,7 +88,7 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
         return null;
     }
 
-    public EnumSet getPermissions() {
+    public EnumSet<Permissions> getPermissions() {
         return permissions;
     }
 

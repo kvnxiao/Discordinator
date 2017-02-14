@@ -116,25 +116,25 @@ public class Discordinator extends Ordinator implements IListener<MessageReceive
                 try {
                     event.getMessage().delete();
                 } catch (MissingPermissionsException e) {
-                    LOGGER.warn("MissingPermissionsException when attempting to to remove call message! Does the bot have permissions to delete messages?");
+                    LOGGER.warn("MissingPermissionsException when attempting to remove call message! Does the bot have permissions to delete messages?");
                 } catch (DiscordException e) {
-                    LOGGER.warn("OOPS! DiscordException when attempting to to remove call message!");
+                    LOGGER.warn("OOPS! DiscordException when attempting to remove call message!");
                 }
             });
         }
     }
 
-    private boolean hasPermission(CommandD4J commandD4J, IMessage message, boolean isDm, boolean hasBotMention) {
-        if (hasBotMention != commandD4J.isRequireMention()) {
+    private boolean hasPermission(CommandD4J<?> command, IMessage message, boolean isDm, boolean hasBotMention) {
+        if (hasBotMention != command.isRequireMention()) {
             return false;
         }
         if (isDm) {
-            return commandD4J.isAllowDm();
+            return command.isAllowDm();
         }
-        return checkPermission(commandD4J.getPermissions(), (message.getChannel().getModifiedPermissions(message.getAuthor())));
+        return checkPermission(command.getPermissions(), message.getChannel().getModifiedPermissions(message.getAuthor()));
     }
 
-    public static boolean checkPermission(EnumSet requiredPerms, EnumSet<Permissions> givenPerms) {
+    public static boolean checkPermission(EnumSet<Permissions> requiredPerms, EnumSet<Permissions> givenPerms) {
         return givenPerms.containsAll(requiredPerms);
     }
 
