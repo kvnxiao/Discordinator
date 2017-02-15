@@ -173,6 +173,11 @@ public abstract class CommandD4J<T> extends Command<T> implements ICommandD4J<T>
             return this;
         }
 
+        public CommandBuilderD4J setExecWithSubcommands(boolean execWithSubcommands) {
+            this.execWithSubcommands = execWithSubcommands;
+            return this;
+        }
+
         public CommandBuilderD4J setAllowDm(boolean isAllowDm) {
             this.isAllowDm = isAllowDm;
             return this;
