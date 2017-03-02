@@ -13,7 +13,6 @@ sourceCompatibility = 1.8
 def d4jClass = 'com.github.alphahelix00.discordinator.d4j.DiscordinatorModule'
 
 repositories {
-    mavenCentral()
     jcenter()
     maven { url "https://jitpack.io" }
 }
